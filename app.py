@@ -112,10 +112,12 @@ def add_recommendations(result):
 
 # Handle the request
 
-@app.route('/',methods = ['POST', 'GET'])
+@app.route('/',methods = ['POST', 'GET','OPTIONS'])
 @cross_origin()
 def hello():
-
+   #make the first message to the user
+   if json.loads(request.data).get('utterance') == "Hi!":
+      return json.jsonify({'response':'Hi! I am a chatbot. Ask me anything about fashion!'})
    #take the message from the user 
    question = json.loads(request.data).get('utterance')
 
