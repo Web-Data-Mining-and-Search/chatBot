@@ -5,7 +5,10 @@ def parse_question(question):
                'maincolour', 'secondcolour', 'brand', 'materials', 
                'shortdescription', 'attributes']
     # Loop through the categories
+
     for request in requests:
+        if ':' not in request:
+            return None
         category_name, category_value = request.split(':')
         category_name = category_name.replace(" ", "")
         category_name = category_name.replace("_", "")

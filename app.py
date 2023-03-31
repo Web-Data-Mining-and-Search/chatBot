@@ -53,6 +53,15 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 # make a request to the OpenSearch client
 
 def get_response(question_dict):
+
+   if not question_dict:
+      return {
+         'has_response' : 'false',
+         'recommendations' : [],
+         'response' : "I'm sorry, I didn't understand your request. Please try again.",
+         'system_action' : 'inform',
+         }
+
    query_denc = {
    'size': 10,
    '_source': ['product_id', 'product_family', 'product_category', 'product_sub_category', 'product_gender', 
@@ -88,9 +97,7 @@ def responseToText(results):
          recommandation.append(add_recommendations(result))
 
    else:
-
-      textReponse = "I'm sorry, I don't know what you're talking about"
-
+      textReponse = "I'm sorry, I didn't find any product matching your request. Please try again."
 
    return { 
       'has_response' : 'true',

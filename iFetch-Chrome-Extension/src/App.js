@@ -40,6 +40,11 @@ function Recomenadation(props) {
     setIndex(clamp(index + (dir * 1), 0, recommendations.length - 1))
   }
 
+  var url = "https://www.farfetch.com/pt/shopping/"
+  recommendations[index].product_url = (url + 
+        'item-' + recommendations[index].id.toString() + ".aspx"
+        )
+
   return (
     <div className='response'>
     <div className={props.is_user ? 'message-content-user' : 'message-content-bot'}>
@@ -49,7 +54,9 @@ function Recomenadation(props) {
       <button className={index == 0 ? "invisible-button" : "regular-arrows"} onClick={() =>{
         click(-1)
       }}>{"<"}</button>
-      <img src={(recommendations[index].image_path)} style={{ alignSelf: 'center' }} />
+      <img src={recommendations[index].image_path} onClick={() => {
+        window.open(recommendations[index].product_url)
+      }}  style={{ alignSelf: 'center' }}  /> 
       <button className={index == recommendations.length - 1 ? "invisible-button" : "regular-arrows"} onClick={() =>{
         click(1)
       }}>{">"}</button>
@@ -74,6 +81,9 @@ function Message(props) {
 
   return (
     <div className={is_user ? 'message-user' : 'message-bot'} ref={ref}>
+      <div className={is_user ? 'message-content-user' : 'message-content-bot'}>
+        {message.utterance}
+      </div>
       {recommendations.length != 0 ? <Recomenadation message = {message} is_user={is_user}/> : <></>}
       <div className={is_user ? 'message-timestamp-user' : 'message-timestamp-bot'}>
         {message.provider_id}
