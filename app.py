@@ -11,7 +11,7 @@ import requests
 import pandas as pd
 import time
 import numpy as np
-
+from response import description_product
 from parsequestion import *
 
 from transformers import CLIPProcessor, CLIPModel
@@ -108,6 +108,7 @@ def add_recommendations(result):
       'description' : result['_source']['product_short_description'],
       'id' : result['_source']['product_id'],
       'image_path' : result['_source']['product_image_path'],
+      'message' : description_product(result)
    }
    
 
