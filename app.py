@@ -12,6 +12,8 @@ import pandas as pd
 import time
 import numpy as np
 
+from parsequestion import *
+
 from transformers import CLIPProcessor, CLIPModel
 
 # Start the OpenSearch client
@@ -50,8 +52,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 # make a request to the OpenSearch client
 
-def get_response(question):
-
+def get_response(question_dict):
    query_denc = {
    'size': 10,
    '_source': ['product_id', 'product_family', 'product_category', 'product_sub_category', 'product_gender', 
@@ -59,9 +60,9 @@ def get_response(question):
                'product_short_description', 'product_attributes', 'product_image_path', 
                'product_highlights', 'outfits_ids', 'outfits_products'],
    'query': {
-      'multi_match': {
-         'query': question,
-         'fields': ['product_main_colour']
+            'bool':{
+          "must": generate_must_query(question_dict)
+        
       }
    }
    }
@@ -120,8 +121,8 @@ def hello():
       return json.jsonify({'response':'Hi! I am a chatbot. Ask me anything about fashion!'})
    #take the message from the user 
    question = json.loads(request.data).get('utterance')
-
+   question_dict = parse_question(question)
 
    #get the response from the model
-   response = get_response(question)
+   response = get_response(question_dict)
    return json.jsonify(response)
