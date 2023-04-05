@@ -62,16 +62,19 @@ def get_response(question_dict):
          'system_action' : 'inform',
          }
 
+   question_should = question_dict[0]
+   question_must = question_dict[1]
+
    query_denc = {
-   'size': 10,
+   'size': 3,
    '_source': ['product_id', 'product_family', 'product_category', 'product_sub_category', 'product_gender', 
                'product_main_colour', 'product_second_color', 'product_brand', 'product_materials', 
                'product_short_description', 'product_attributes', 'product_image_path', 
                'product_highlights', 'outfits_ids', 'outfits_products'],
    'query': {
             'bool':{
-          "must": generate_must_query(question_dict)
-        
+            "must": generate_query(question_must),
+            "should": generate_query(question_should),
       }
    }
    }
@@ -129,8 +132,8 @@ def hello():
       return json.jsonify({'response':'Hi! I am a chatbot. Ask me anything about fashion!'})
    #take the message from the user 
    question = json.loads(request.data).get('utterance')
-   question_dict = parse_question(question)
+   parsed_question = parse_question(question)
 
    #get the response from the model
-   response = get_response(question_dict)
+   response = get_response(parsed_question)
    return json.jsonify(response)
