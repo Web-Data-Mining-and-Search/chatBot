@@ -67,9 +67,10 @@ chrome.runtime.onMessage.addListener(messagesFromReactAppListener);
 const cssContent = `
   position: fixed;
   bottom: 23px;
+  border-radius: 10px;
   right: 28px;
   width: 404px;
-  height: 520px;
+  height: 630px;
   z-index: 10;
   background: white;
 `
@@ -79,6 +80,7 @@ const myIFrame = `
     style="
       width: inherit;
       height: inherit;
+      border-radius: 10px;
     ">
   </iframe>
 `
