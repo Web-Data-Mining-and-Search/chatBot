@@ -64,6 +64,8 @@ def get_response(question_dict):
 
    question_should = question_dict[0]
    question_must = question_dict[1]
+   question_must_not = question_dict[2]
+   question_filter = question_dict[3]
 
    query_denc = {
    'size': 3,
@@ -73,16 +75,22 @@ def get_response(question_dict):
                'product_highlights', 'outfits_ids', 'outfits_products'],
    'query': {
             'bool':{
-            "must": generate_query(question_must),
-            "should": generate_query(question_should),
+               "must": generate_query(question_must),
+               "should": generate_query(question_should),
+               "filter": generate_filter_query(question_filter),
+               "must_not": generate_must_not_query(question_must_not)
       }
    }
    }
 
+
    response = client.search(body = query_denc,index = index_name)
 
+   
    # Get the results
    results = response['hits']['hits']
+
+
    textReponse = responseToText(results)
 
    return textReponse
@@ -121,6 +129,8 @@ def add_recommendations(result):
       'message' : description_product(result)
    }
    
+
+#make scroll research to the opensearch client to get every items then store it in a .txt file
 
 # Handle the request
 
