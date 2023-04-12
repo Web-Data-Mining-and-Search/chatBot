@@ -6,7 +6,7 @@ from response import *
 from parsequestion import *
 from query import *
 
-from transformers import CLIPProcessor, CLIPModel
+
 
 # Start the OpenSearch client
 

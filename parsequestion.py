@@ -36,10 +36,10 @@ def parse_question(question):
             parsed_must_not_question[category_name.replace("mustnot","")] = category_value
         elif category_name.startswith('must'):
             parsed_must_question[category_name.replace("must","")] = category_value
-        elif category_name.startswith('should'):
-            parsed_should_question[category_name.replace("should","")] = category_value
         elif category_name.startswith('filter'):
             parsed_filter_question[category_name.replace("filter","")] = category_value
+        else:
+            parsed_should_question[category_name] = category_value
 
 
         
