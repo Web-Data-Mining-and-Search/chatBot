@@ -18,15 +18,12 @@ const DUMMY_DATA = [
 // const MESSAGES_ENDPOINT = "https://ifetch.novasearch.org/agent/"
 const MESSAGES_ENDPOINT = "http://127.0.0.1:4000"
 
-
-
 function Recomenadation(props) {
   const recommendations = props.message.recommendations
 
   const [img, setImg] = useState()
   const [index, setIndex] = useState(0)
-  const message= recommendations[index].message
-
+  const message = recommendations[index].message
 
   const clamp = (num, min, max) => Math.min(Math.max(num, min), max)
 
@@ -41,11 +38,6 @@ function Recomenadation(props) {
   var click = (dir) => {
     setIndex(clamp(index + (dir * 1), 0, recommendations.length - 1))
   }
-
-  var url = "https://www.farfetch.com/pt/shopping/"
-  recommendations[index].product_url = (url + 
-        'item-' + recommendations[index].id.toString() + ".aspx"
-        )
 
   return (
     <div className='response'>
@@ -94,11 +86,11 @@ function Message(props) {
   )
 }
 
-// Fnction responsible for printing all the userMessages
+// Fnction responsible for printing all the messages
 function Messages(props) {
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1}}>
-      {props.userMessages.map((message, i) => {
+      {props.messages.map((message, i) => {
         return (
           <View key={message.provider_id + i}>
             <Message message={message}/>
@@ -112,32 +104,6 @@ function Messages(props) {
 // Function that sends a message form
 function SendMessageForm (props) {
   const [message, setMessage] = useState("")
-  const [userMessages, setUserMessages] = useState([])
-  const [indexMessage, setIndexMessage] = useState(0)
-
-  document.onkeydown = function (e) {
-    if (e.key === 'ArrowUp' && document.activeElement.className === "text-form") {
-      setIndexMessage(indexMessage + 1)
-      getPreviousMessage()
-    }
-    if (e.key === 'ArrowDown' && document.activeElement.className === "text-form") {
-      setIndexMessage(indexMessage - 1)
-      getPreviousMessage()
-    }
-  };
-
-  const getPreviousMessage = () => {
-    if (indexMessage >= userMessages.length ) {
-      setIndexMessage( userMessages.length  - 1)
-      return
-    }
-    if (indexMessage < 0 || userMessages.length == 0) {
-      setIndexMessage(0)
-      return
-    }
-    const previousMessage = userMessages[userMessages.length - indexMessage - 1]
-    setMessage(previousMessage)
-  }
   
   var handleChange = (e) => {
     setMessage(e.target.value)
@@ -146,8 +112,6 @@ function SendMessageForm (props) {
   const handleSubmit = (e) => {
     e.preventDefault();
     props.handleSubmit(message)
-    setUserMessages([...userMessages, message])
-    setIndexMessage(0)
     setMessage("")
   }
 
@@ -204,7 +168,7 @@ function randomNumberInRange(min, max) {
 }
 
 function App() {
-  const [userMessages, setMessages] = useState([])
+  const [messages, setMessages] = useState([])
   const [showContent, setShowContent] = useState(true)
   const [userID, setUserID] = useState(`${randomNumberInRange(0, 10000)}`)
   const [sessionID, setSessionID] = useState(`${randomNumberInRange(0, 10000)}`)
@@ -248,7 +212,7 @@ function App() {
       recommendations : []
     }
 
-    setMessages([...userMessages, temp])
+    setMessages([...messages, temp])
     SendMessage(message, userID, sessionID, "", "", recieveMessage, selectedImage)
     setSelectedImage(null)
     setSelectedFile(null)
@@ -264,7 +228,7 @@ function App() {
     }
 
     if (isUpToDate) {
-      setMessages([...userMessages, temp1])
+      setMessages([...messages, temp1])
       return
     }
 
@@ -274,7 +238,7 @@ function App() {
       recommendations : []
     }
 
-    setMessages([...userMessages, temp2, temp1])
+    setMessages([...messages, temp2, temp1])
   }
 
   useEffect(() => {
@@ -290,7 +254,7 @@ function App() {
     setSelectedFile(event.target.files[0])
     
     reader.onload = () => {      
-      setSelectedImage(reader.result)
+     setSelectedImage(reader.result)
     }
   }
 
@@ -300,7 +264,7 @@ function App() {
         <h1 className='message-content-bot'>iFetch</h1>
       </div>
       <View style={styles.container}>
-        <Messages userMessages={userMessages}/>
+        <Messages messages={messages}/>
       </View>
       <div className='form-container'>
         <SendMessageForm handleSubmit = {handleSubmit}/>

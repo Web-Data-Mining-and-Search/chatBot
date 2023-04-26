@@ -1,3 +1,5 @@
+
+
 // const MESSAGES_ENDPOINT = "https://ifetch.novasearch.org/agent/"
 const MESSAGES_ENDPOINT = "http://127.0.0.1:4000"
 
@@ -59,18 +61,16 @@ const messagesFromReactAppListener = (message, sender, response) => {
 }
 
 // Fired when a message is sent from either an extension process or a content script.
-chrome.runtime.onMessage.addListener(messagesFromReactAppListener);
-
+chrome.runtime.onMessage.addListener(messagesFromReactAppListener)
 
 // Edit the DOM of the page in a way that lets you add the chat 
 //  into the window. 
 const cssContent = `
   position: fixed;
   bottom: 23px;
-  border-radius: 10px;
   right: 28px;
   width: 404px;
-  height: 630px;
+  height: 520px;
   z-index: 10;
   background: white;
 `
@@ -80,7 +80,6 @@ const myIFrame = `
     style="
       width: inherit;
       height: inherit;
-      border-radius: 10px;
     ">
   </iframe>
 `

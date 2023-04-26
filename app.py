@@ -2,7 +2,6 @@ from flask import Flask, request, json
 
 
 from opensearchpy import OpenSearch
-from ConvertImage import convertImage
 from response import *
 from parsequestion import *
 from query import *
@@ -61,8 +60,9 @@ def get_response(question_dict):
 @app.route('/',methods = ['POST', 'GET','OPTIONS'])
 @cross_origin()
 def hello():
+   jsonData = json.loads(request.data)
    #make the first message to the user
-   if json.loads(request.data).get('utterance') == "Hi!":
+   if jsonData.get('utterance') == "Hi!":
       return json.jsonify({'response':'Hi! I am a chatbot. Ask me anything about fashion!'})
    #take the message from the user 
    jsonData = json.loads(request.data)
