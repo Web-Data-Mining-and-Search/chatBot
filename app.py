@@ -2,6 +2,7 @@ from flask import Flask, request, json
 
 
 from opensearchpy import OpenSearch
+from images import write_out
 from response import *
 from parsequestion import *
 from query import *
@@ -68,6 +69,8 @@ def hello():
    jsonData = json.loads(request.data)
    question = jsonData.get('utterance')
    base64Image = jsonData.get('file')
+   if base64Image:
+      write_out(base64Image)
    parsed_question = parse_question(question)
 
    #get the response from the model
