@@ -1,55 +1,59 @@
-def parse_question(question):
+from query import get_similar_images
+
+def parse_question(questionText=None, questionImage=None):
 
     """Parse the question and return a dictionary with the categories and values.
     rvale: dictionary with the categories and values. (parsed_should_question, parsed_must_question,
     parsed_must_not_question, parsed_filter_question)
     return None if the question is not valid.
     """
+    if questionText and not questionImage:
+        requests = questionText.split(',')
 
-    requests = question.split(',')
-
-    parsed_should_question, parsed_must_question, parsed_must_not_question, parsed_filter_question = {}, {}, {}, {}
-    categories_list = ['id', 'family', 'category', 'subcategory', 'gender', 
-                'maincolour', 'secondcolour', 'brand', 'materials', 
-                'shortdescription', 'attributes']
-    
-
-    for request in requests:
-
-        if ':' not in request or request.count(':') > 1:
-            print("Error: invalid request: {}".format(request))
-            return None
-        
-        category_name, category_value = request.split(':')
-        category_name = category_name.strip().lower()
-        category_name = category_name.replace(" ", "")
-        category_value = category_value.strip().lower()
-
-        if not check_category(category_name, categories_list):
-            print("Error: invalid category: {}".format(category_name))
-            return None
-        
-        category_name = change_request(category_name)
-
-
-        if category_name.startswith('mustnot'):
-            parsed_must_not_question[category_name.replace("mustnot","")] = category_value
-        elif category_name.startswith('must'):
-            parsed_must_question[category_name.replace("must","")] = category_value
-        elif category_name.startswith('filter'):
-            parsed_filter_question[category_name.replace("filter","")] = category_value
-        else:
-            parsed_should_question[category_name] = category_value
-
-
+        parsed_should_question, parsed_must_question, parsed_must_not_question, parsed_filter_question = {}, {}, {}, {}
+        categories_list = ['id', 'family', 'category', 'subcategory', 'gender', 
+                    'maincolour', 'secondcolour', 'brand', 'materials', 
+                    'shortdescription', 'attributes']
         
 
-    return {
-        'must' : parsed_must_question,
-        'must_not' : parsed_must_not_question,
-        'should' : parsed_should_question,
-        'filter' : parsed_filter_question
-    }
+        for request in requests:
+
+            if ':' not in request or request.count(':') > 1:
+                print("Error: invalid request: {}".format(request))
+                return None
+            
+            category_name, category_value = request.split(':')
+            category_name = category_name.strip().lower()
+            category_name = category_name.replace(" ", "")
+            category_value = category_value.strip().lower()
+
+            if not check_category(category_name, categories_list):
+                print("Error: invalid category: {}".format(category_name))
+                return None
+            
+            category_name = change_request(category_name)
+
+
+            if category_name.startswith('mustnot'):
+                parsed_must_not_question[category_name.replace("mustnot","")] = category_value
+            elif category_name.startswith('must'):
+                parsed_must_question[category_name.replace("must","")] = category_value
+            elif category_name.startswith('filter'):
+                parsed_filter_question[category_name.replace("filter","")] = category_value
+            else:
+                parsed_should_question[category_name] = category_value
+
+
+            
+
+        return {
+            'must' : parsed_must_question,
+            'must_not' : parsed_must_not_question,
+            'should' : parsed_should_question,
+            'filter' : parsed_filter_question
+        }
+    elif questionImage and not questionText:
+         get_similar_images()
 
 # Utility functions
 

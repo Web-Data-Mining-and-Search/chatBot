@@ -49,7 +49,11 @@ def get_response(question_dict):
 
    if not question_dict:
       return generate_response("I don't understand your question. Please ask me something else.")
-
+   
+   """
+   if image:
+      response=client.search(body=get_similar_images(),index= index_name)
+   """
    response = client.search(body = get_query(question_dict),index = index_name)
 
    textReponse = responseToText(response['hits']['hits'])

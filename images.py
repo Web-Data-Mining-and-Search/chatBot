@@ -6,7 +6,7 @@ import torch
 import torchvision.transforms as transforms
 import io
 import torch.nn.functional as F
-from transformers import CLIPProcessor, CLIPModel, CLIPTokenizer
+from transformers import CLIPProcessor, CLIPModel, CLIPTokenizer, CLIPImageProcessor
 
 # search_query = "black boots"
 
@@ -31,5 +31,4 @@ def write_out(image):
     except:
         pass
     image.save('images/image.png', 'PNG')
-
 
