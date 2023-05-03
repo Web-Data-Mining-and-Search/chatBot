@@ -63,7 +63,7 @@ def get_similar_images():
     
     return{
         "knn": {
-            "image_embedding": {
+            "combined_embedding": {
                 "vector": embeddings_img[0].detach().numpy(),
                 "k": 10
             }
