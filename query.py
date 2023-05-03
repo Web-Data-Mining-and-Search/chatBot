@@ -1,12 +1,13 @@
+import numpy as np
 from parsequestion import generate_query
 from PIL import Image
 
 import torch.nn.functional as F
 from transformers import CLIPProcessor, CLIPModel, CLIPTokenizer, CLIPImageProcessor
-
+import torch
 # Create the query
 
-def get_query(questionText_dict, has_image):
+def get_query(questionText_dict, has_image,question=None):
     '''
     Generates a search query based on the given question text dictionary and whether the question includes an image.
     
@@ -42,7 +43,7 @@ def get_query(questionText_dict, has_image):
     elif has_image and not questionText_dict:
         query['query']=get_similar_images()
     else:
-        query['query']=get_similar_images()
+        query['query']=get_images_text(question)
 
     return query
 
@@ -65,6 +66,38 @@ def get_similar_images():
         "knn": {
             "combined_embedding": {
                 "vector": embeddings_img[0].detach().numpy(),
+                "k": 10
+            }
+        }
+    }
+
+def get_images_text(question):
+
+    '''
+    This function retrieves the embeddings for an input image  and input text using the CLIP model, and returns a query that can be
+    used to find similar images in an Opensearch index.
+
+    @return: A dictionary with a query with 'knn' key for retrieving similar images based on the input image
+    @rtype: dict
+    '''
+
+    model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+    processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+    tokenizer = CLIPTokenizer.from_pretrained("openai/clip-vit-base-patch32")
+
+    qimg = Image.open("images/image.png")
+    input_img= processor(images=qimg, return_tensors="pt")
+    embeddings_img = F.normalize(model.get_image_features(**input_img))
+
+    inputs = tokenizer([question], padding=True, return_tensors="pt")
+    text_features = F.normalize(model.get_text_features(**inputs))
+    text_embeds = text_features[0].detach().numpy().tolist()
+    embeds = torch.tensor(embeddings_img[0].detach().numpy()+ np.array(text_embeds))
+    comb_embeds = F.normalize(embeds, dim=0).to(torch.device('cpu')).numpy()
+    return{
+        "knn": {
+            "combined_embedding": {
+                "vector": comb_embeds,
                 "k": 10
             }
         }

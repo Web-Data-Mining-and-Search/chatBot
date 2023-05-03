@@ -45,7 +45,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 # make a request to the OpenSearch client
 
-def get_response(question_dict, has_image):
+def get_response(question_dict, has_image,question=None):
    '''
    Returns a text response based on the given question dictionary and question image.
    
@@ -62,7 +62,7 @@ def get_response(question_dict, has_image):
    if not question_dict and not has_image:
       return generate_response("I don't understand your question. Please ask me something else.")
    
-   response = client.search(body = get_query(question_dict, has_image),index = index_name)
+   response = client.search(body = get_query(question_dict, has_image,question),index = index_name)
    print(response)
    textResponse = responseToText(response['hits']['hits'])
 
@@ -88,5 +88,6 @@ def hello():
    parsed_question = parse_question(question)
 
    #get the response from the model
-   response = get_response(parsed_question, has_image)
+   response = get_response(parsed_question, has_image, question)
    return json.jsonify(response)
+
