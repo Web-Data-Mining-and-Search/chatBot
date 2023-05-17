@@ -1,12 +1,16 @@
-def parse_question(question):
 
-    """Parse the question and return a dictionary with the categories and values.
-    rvale: dictionary with the categories and values. (parsed_should_question, parsed_must_question,
-    parsed_must_not_question, parsed_filter_question)
-    return None if the question is not valid.
-    """
+def parse_question(questionText):
+    '''
+    Parses the questionText and returns a dictionary with keys for 'must', 'must_not', 'should', and 'filter'.
+    
+    @param questionText: A string with comma-separated category and value pairs.
+    @type questionText: str
 
-    requests = question.split(',')
+    @return: A dictionary with keys for 'must', 'must_not', 'should', and 'filter', each containing a
+             dictionary of parsed category-value pairs. None if the question is not valid.
+    @rtype: dict/None
+    '''
+    requests = questionText.split(',')
 
     parsed_should_question, parsed_must_question, parsed_must_not_question, parsed_filter_question = {}, {}, {}, {}
     categories_list = ['id', 'family', 'category', 'subcategory', 'gender', 
@@ -41,9 +45,6 @@ def parse_question(question):
         else:
             parsed_should_question[category_name] = category_value
 
-
-        
-
     return {
         'must' : parsed_must_question,
         'must_not' : parsed_must_not_question,
@@ -54,7 +55,15 @@ def parse_question(question):
 # Utility functions
 
 def change_request(request):
+    '''
+    Removes whitespace and underscores from a request string to standardize category names.
+    
+    @param request: A string representing a category name.
+    @type request: str
 
+    @return: A string representing the standardized category name.
+    @rtype: str
+    '''
     request = request.replace(" ", "")
     request = request.replace("_", "")
 

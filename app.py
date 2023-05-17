@@ -5,7 +5,7 @@ from flask import Flask, request, json
 from opensearchpy import OpenSearch
 from images import write_out
 from response import *
-from parsequestion import *
+from parsequestion import parse_question
 from query import *
 
 
@@ -47,23 +47,36 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 # make a request to the OpenSearch client
 
-def get_response(question_dict):
+def get_response(question_dict, has_image,question=None):
+   '''
+   Returns a text response based on the given question dictionary and question image.
+   
+   @param question_dict: A dictionary containing information about the user's question.
+   @type question_dict: dict
+   
+   @param has_image: A boolean indicating whether the question includes an image.
+   @type has_image: bool
+   
+   @return: A text response generated based on the user's question.
+   @rtype: str
+   '''
 
-   if not question_dict:
+   if not question_dict and not has_image:
       return generate_response("I don't understand your question. Please ask me something else.")
+   
+   response = client.search(body = get_query(question_dict, has_image,question),index = index_name)
+   print(response)
+   textResponse = responseToText(response['hits']['hits'])
 
-   response = client.search(body = get_query(question_dict),index = index_name)
+   return textResponse
 
-   textReponse = responseToText(response['hits']['hits'])
-
-   return textReponse
 
 # Handle the request
-
 @app.route('/',methods = ['POST', 'GET','OPTIONS'])
 @cross_origin()
 def hello():
    #get the first message from the user
+   has_image = False
    jsonData = json.loads(request.data)
 
    #make the first message to the user
@@ -74,12 +87,14 @@ def hello():
    
    user_id = jsonData.get('user_id')
    question = jsonData.get('utterance')
-   print(question)   
    base64Image = jsonData.get('file')
    if base64Image:
       write_out(base64Image)
-   parsed_question = parse_question(question)   #get the response from the model
-   response = get_response(parsed_question)
+      has_image = True
+   parsed_question = parse_question(question)
+
+   #get the response from the model
+   response = get_response(parsed_question, has_image, question)
    return json.jsonify(response)
 
 
@@ -96,3 +111,5 @@ def random_items():
    response = client.search(body = random_query(),index = index_name)
    textReponse = responseToText(response['hits']['hits'])
    return json.jsonify(textReponse)
+      
+

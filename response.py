@@ -48,11 +48,10 @@ def responseToText(results):
 # generate the response
 
 def generate_response(text):
-    
-        return { 
-            'has_response' : 'true',
-            'recommendations' : [],
-            'response' : text,
-            'system_action' : 'inform',
-            }
+    return { 
+        'has_response' : 'true',
+        'recommendations' : [],
+        'response' : text,
+        'system_action' : 'inform',
+        }
 
