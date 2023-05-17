@@ -73,6 +73,8 @@ const cssContent = `
   height: 520px;
   z-index: 10;
   background: white;
+  border-radius: 30px;
+  overflow: hidden;
 `
 
 const myIFrame = `
@@ -80,6 +82,8 @@ const myIFrame = `
     style="
       width: inherit;
       height: inherit;
+      border-radius: 30px;
+      border-color: #222222;
     ">
   </iframe>
 `

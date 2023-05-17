@@ -1,3 +1,4 @@
+import datetime
 from flask import Flask, request, json
 
 
@@ -40,6 +41,7 @@ client = OpenSearch(
 
 from flask_cors import CORS,cross_origin
 app = Flask(__name__)
+app.permanent_session_lifetime = datetime.timedelta(days=365)
 cors=CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
@@ -61,18 +63,36 @@ def get_response(question_dict):
 @app.route('/',methods = ['POST', 'GET','OPTIONS'])
 @cross_origin()
 def hello():
+   #get the first message from the user
    jsonData = json.loads(request.data)
+
    #make the first message to the user
    if jsonData.get('utterance') == "Hi!":
       return json.jsonify({'response':'Hi! I am a chatbot. Ask me anything about fashion!'})
+   
    #take the message from the user 
-   jsonData = json.loads(request.data)
+   
+   user_id = jsonData.get('user_id')
    question = jsonData.get('utterance')
+   print(question)   
    base64Image = jsonData.get('file')
    if base64Image:
       write_out(base64Image)
-   parsed_question = parse_question(question)
-
-   #get the response from the model
+   parsed_question = parse_question(question)   #get the response from the model
    response = get_response(parsed_question)
    return json.jsonify(response)
+
+
+def random_query():
+   return {
+      "size": 120,
+   }
+
+
+# Generate random items for profile creation
+@app.route('/random_items',methods = ['GET','OPTIONS'])
+@cross_origin()
+def random_items():
+   response = client.search(body = random_query(),index = index_name)
+   textReponse = responseToText(response['hits']['hits'])
+   return json.jsonify(textReponse)
