@@ -45,6 +45,20 @@ def responseToText(results):
         'system_action' : 'inform',
         }
 
+def responseToProfil(results):
+    recommandation = []
+    if len(results) > 0:
+        for result in results:
+            recommandation.append({
+            'brand' : result['_source']['product_brand'],
+            'id' : result['_source']['product_id'],
+            'image_path' : result['_source']['product_image_path'],}
+        )
+    return { 
+        'recommendations' : recommandation,
+        }
+
+
 # generate the response
 
 def generate_response(text):
