@@ -63,7 +63,8 @@ def get_response(question_dict, has_image,question=None):
 
    if not question_dict and not has_image:
       return generate_response("I don't understand your question. Please ask me something else.")
-   
+   print("query:")
+   print(get_query(question_dict, has_image,question))
    response = client.search(body = get_query(question_dict, has_image,question),index = index_name)
    print(response)
    textResponse = responseToText(response['hits']['hits'])
@@ -119,4 +120,26 @@ def random_items():
    textReponse = responseToText(response['hits']['hits'])
    return json.jsonify(textReponse)
       
+
+@app.route('/profile',methods = ['POST','OPTIONS'])
+@cross_origin()
+def profile():
+   jsonData = json.loads(request.data)
+   womenProfile = jsonData.get('women')
+   menProfile = jsonData.get('men')
+   kidsProfile = jsonData.get('kids')
+   beautyProfile = jsonData.get('beauty')
+   stateOfProfile = jsonData.get('state')
+   if stateOfProfile == 'tops':
+      responseTops = client.search(body = profile_query(womenProfile, menProfile, kidsProfile, beautyProfile, "T-Shirts & Vests"),index = index_name)
+      textresponseTops = responseToProfil(responseTops['hits']['hits'])
+      return json.jsonify(textresponseTops)
+   if stateOfProfile == 'shoes':
+      responseShoes = client.search(body = profile_query(womenProfile, menProfile, kidsProfile, beautyProfile, "Shoes"),index = index_name)
+      textresponseShoes = responseToProfil(responseShoes['hits']['hits'])
+      return json.jsonify(textresponseShoes)
+   else:
+      responsePants = client.search(body = profile_query(womenProfile, menProfile, kidsProfile, beautyProfile, "Pants"),index = index_name)
+      textresponsePants = responseToProfil(responsePants['hits']['hits'])
+      return json.jsonify(textresponsePants)
 

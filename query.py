@@ -102,3 +102,45 @@ def get_images_text(question):
             }
         }
     }
+
+def profile_query(womenProfile, menProfile, kidsProfile, beautyProfile, categ):
+   query = {'should': [], 'must': []}
+
+   profiles = [womenProfile, menProfile, kidsProfile, beautyProfile]
+   genders = ['WOMEN', 'MEN', 'KIDS', 'BEAUTY']
+
+   for profile, gender in zip(profiles, genders):
+      if profile:
+         query['should'].append({
+               "multi_match": {
+                  "query": gender,
+                  "fields": 'product_gender',
+               }
+         })
+
+   if categ == 'Shoes':
+      query['must'].append({
+            "multi_match": {
+               "query": 'Shoes',
+               "fields": 'product_family',
+            }
+      })
+   else:
+      query['must'].append({
+            "multi_match": {
+               "query": categ,
+               "fields": 'product_category',
+            }
+      })
+   return {
+        'size': 20,
+        '_source': ['product_gender', 'product_category', 'product_family'],
+        'query': {
+            'bool': {
+                'must': query['must'],
+                'must_not': [],
+                'should': query['should'],
+                'filter': []
+            }
+        }
+    }
