@@ -97,11 +97,18 @@ def hello():
    response = get_response(parsed_question, has_image, question)
    return json.jsonify(response)
 
-
+   
 def random_query():
    return {
       "size": 120,
    }
+
+@app.route('/profile',methods = ['POST', 'OPTIONS'])
+@cross_origin()
+def profile_category():
+   jsonData = json.loads(request.data)
+   print(jsonData)
+
 
 
 # Generate random items for profile creation

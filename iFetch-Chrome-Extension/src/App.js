@@ -193,13 +193,14 @@ function randomNumberInRange(min, max) {
 
 function App() {
     const [messages, setMessages] = useState([]);
-    const [showContent, setShowContent] = useState(true);
+    const [showContent, setShowContent] = useState(false);
     const [userID, setUserID] = useState(`${randomNumberInRange(0, 10000)}`);
     const [sessionID, setSessionID] = useState(
         `${randomNumberInRange(0, 10000)}`
     );
     const [selectedImage, setSelectedImage] = useState(null);
     const [selectedFile, setSelectedFile] = useState(null);
+    const inputRef = useRef(null);
 
     const setChatbox = () => {
         setShowContent(!showContent);
@@ -227,14 +228,12 @@ function App() {
 
     
 
-    function setStartProfileCreator () {
+    function setStartSelectingLikedItem () {
         //wait for the profile image to be loaded
         const randomProduct = randomItem();
         randomProduct.then((data) => {
-            //replace the content-container by a grid of card 
             const container = document.getElementById("content-container");
-            container.removeChild(document.getElementsByClassName("logo-container")[0]);
-            container.removeChild(document.getElementsByClassName("button-container")[0]);
+            //replace the content-container by a grid of card 
             container.className = "grid-container";
             //add a title that says "Select your favorite product" and take the whole top row
             const title = document.createElement("div");
@@ -269,6 +268,55 @@ function App() {
         });
     };
 
+    function setStartSelectingProfile(){
+        const container = document.getElementById("content-container");
+        container.removeChild(document.getElementsByClassName("logo-container")[0]);
+        container.removeChild(document.getElementsByClassName("button-container")[0]);
+        container.removeChild(document.getElementsByClassName("continue-container")[0]);
+        // make a list of 4 buttons one for kids, one for women, one for men and one for beauty
+        const buttonContainer = document.createElement("div");
+        buttonContainer.className = "button-category-container";
+        const kidsButton = document.createElement("button");
+        kidsButton.className = "button-category";
+        kidsButton.innerHTML = "Kids";
+        kidsButton.onclick = () => {
+            selectItem(kidsButton);
+        }
+        buttonContainer.appendChild(kidsButton);
+        const womenButton = document.createElement("button");
+        womenButton.className = "button-category";
+        womenButton.innerHTML = "Women";
+        womenButton.onclick = () => {
+            selectItem(womenButton);
+        }
+        buttonContainer.appendChild(womenButton);
+        const menButton = document.createElement("button");
+        menButton.className = "button-category";
+        menButton.innerHTML = "Men";
+        menButton.onclick = () => {
+            selectItem(menButton);
+        }
+        buttonContainer.appendChild(menButton);
+        const beautyButton = document.createElement("button");
+        beautyButton.className = "button-category";
+        beautyButton.innerHTML = "Beauty";
+        beautyButton.onclick = () => {
+            selectItem(beautyButton);
+        }
+        buttonContainer.appendChild(beautyButton);
+        container.appendChild(buttonContainer);
+    }
+
+    const selectItem = (item) => {
+        // if the card is already selected, unselect it
+        if (item.className === "button-category-selected") {
+            item.className = "button-category";
+        } else {
+            item.className = "button-category-selected";
+        }
+    };
+
+
     function createProfile() {
         //get all the selected cards
         const cards = document.getElementsByClassName("card-selected");
@@ -281,7 +329,6 @@ function App() {
     }
 
     const selectCard = (card) => {
-        console.log(card);
         // if the card is already selected, unselect it
         if (card.className === "card-selected") {
             card.className = "card";
@@ -333,6 +380,7 @@ function App() {
             selectedImage
         );
         setSelectedImage(null);
+        inputRef.current.value = null;
         setSelectedFile(null);
     };
 
@@ -386,40 +434,53 @@ function App() {
         };
     };
 
+    function setChatbot(){
+        const container = document.getElementById("content-container");
+        container.removeChild(document.getElementsByClassName("logo-container")[0]);
+        container.removeChild(document.getElementsByClassName("button-container")[0]);
+        container.removeChild(document.getElementsByClassName("continue-container")[0]);
+        container.className = "chat-container";
+        setChatbox();
+    }
+
     return (
-        <div className="content-container" id="content-container">
-            <div className="logo-container">
-                <img src={logo} className="logo" />
+        <div>
+            <div> {showContent ? null :
+                <div className="content-container" id="content-container">
+                    <div className="logo-container">
+                        <img src={logo} className="logo" />
+                    </div>
+                    <div className="button-container">
+                        <button onClick={setStartSelectingProfile} className="chat-button">
+                            Start IFetch
+                        </button>
+                    </div>
+                    <div className="continue-container">
+                        <button className="continue-text" onClick={setChatbot}>Continue without setting up a profile</button>
+                    </div>
+                </div> }
             </div>
-            <div className="button-container">
-                <button onClick={setStartProfileCreator} className="chat-button">
-                    Start IFecth
-                </button>
+            <div>
+                {showContent ? 
+                    <div className='chat-container'>
+                        <div className='title-container'>
+                            <h1 className='message-content-bot'>iFetch</h1>
+                        </div>
+                        <View style={styles.container}>
+                        <Messages messages={messages}/>
+                        </View>
+                        <div className='form-container'>
+                        <SendMessageForm handleSubmit = {handleSubmit}/>
+                        <input ref = {inputRef} className= 'image-input' 
+                            type='file' placeholder="Upload an Image" 
+                            required onChange={selectFileHandler} text='Upload an Image'
+                        />
+                        </div>
+                    </div> : null}
             </div>
         </div>
+        
     );
-    {
-        /* <div className='title-container'>
-        <h1 className='message-content-bot'>iFetch</h1>
-        </div> */
-    }
-    {
-        /* <View style={styles.container}>
-        <Messages messages={messages}/>
-        </View>
-        <div className='form-container'>
-        <SendMessageForm handleSubmit = {handleSubmit}/>
-        <input 
-            className= 'image-input' 
-            type='file' 
-            id='file' 
-            name="file"
-            placeholder="Upload an Image" 
-            required
-            onChange={selectFileHandler} 
-        />
-        </div> */
-    }
 }
 
 const styles = StyleSheet.create({
