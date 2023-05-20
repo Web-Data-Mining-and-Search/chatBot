@@ -47,7 +47,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 # make a request to the OpenSearch client
 
-def get_response(question_dict, has_image,question=None):
+def get_response(question_dict, has_image,question=None,profile=None):
    '''
    Returns a text response based on the given question dictionary and question image.
    
@@ -64,8 +64,8 @@ def get_response(question_dict, has_image,question=None):
    if not question_dict and not has_image:
       return generate_response("I don't understand your question. Please ask me something else.")
    print("query:")
-   print(get_query(question_dict, has_image,question))
-   response = client.search(body = get_query(question_dict, has_image,question),index = index_name)
+   print(get_query(question_dict, has_image,question,profile))
+   response = client.search(body = get_query(question_dict, has_image,question,profile),index = index_name)
    print(response)
    textResponse = responseToText(response['hits']['hits'])
 
@@ -93,9 +93,12 @@ def hello():
       write_out(base64Image)
       has_image = True
    parsed_question = parse_question(question)
-
+   profile={}
+   profile["image"]=["https://large.novasearch.org/farfetch_products/images/16/41/17/65/16411765.jpg","https://large.novasearch.org/farfetch_products/images/16/64/39/73/16643973.jpg","https://large.novasearch.org/farfetch_products/images/16/62/43/45/16624345.jpg"]
+   profile["brand"]=["prada","hugo boss","massimo duti"]
+   #profile=None
    #get the response from the model
-   response = get_response(parsed_question, has_image, question)
+   response = get_response(parsed_question, has_image, question,profile)
    return json.jsonify(response)
 
    

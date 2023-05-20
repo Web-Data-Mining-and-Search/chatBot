@@ -1,13 +1,14 @@
 import numpy as np
 from parsequestion import generate_query
 from PIL import Image
+import requests
 
 import torch.nn.functional as F
 from transformers import CLIPProcessor, CLIPModel, CLIPTokenizer, CLIPImageProcessor
 import torch
 # Create the query
 
-def get_query(questionText_dict, has_image,question=None):
+def get_query(questionText_dict, has_image,question=None,profile=None):
     '''
     Generates a search query based on the given question text dictionary and whether the question includes an image.
     
@@ -41,13 +42,13 @@ def get_query(questionText_dict, has_image,question=None):
             }
         }
     elif has_image and not questionText_dict:
-        query['query']=get_similar_images()
+        query['query']=get_similar_images(profile)
     else:
-        query['query']=get_images_text(question)
+        query['query']=get_images_text(question,profile)
 
     return query
 
-def get_similar_images():
+def get_similar_images(profile=None):
     '''
     This function retrieves the embeddings for an input image using the CLIP model, and returns a query that can be
     used to find similar images in an Opensearch index.
@@ -61,17 +62,45 @@ def get_similar_images():
     qimg = Image.open("images/image.png")
     input_img= processor(images=qimg, return_tensors="pt")
     embeddings_img = F.normalize(model.get_image_features(**input_img))
-    
-    return{
-        "knn": {
-            "combined_embedding": {
-                "vector": embeddings_img[0].detach().numpy(),
-                "k": 10
+
+    if profile !=None:
+        embedding_profile=0
+        embedding_profile_brand=0
+        for photo in profile["image"]:
+            pimg = Image.open(requests.get(photo, stream=True).raw)
+            profile_img = processor(images=pimg,return_tensors="pt")
+            embeddings_profileimg = F.normalize(model.get_image_features(**profile_img))
+            embedding_profile += embeddings_profileimg[0].detach().numpy()
+
+        for brand in profile["brand"]:
+            pbrand = tokenizer([brand], padding=True, return_tensors="pt")
+            brand_features = F.normalize(model.get_text_features(**pbrand))
+            embedding_profile_brand+=0.2*brand_features[0].detach().numpy()
+
+        profile_brand_embeds = embedding_profile_brand.tolist()
+
+        embeds = torch.tensor(embeddings_img[0].detach().numpy()+ 0.2*embedding_profile+ profile_brand_embeds)
+        comb_embeds = F.normalize(embeds, dim=0).to(torch.device('cpu')).numpy()
+        return{
+            "knn": {
+                "combined_embedding": {
+                    "vector": comb_embeds,
+                    "k": 3
+                }
             }
         }
-    }
 
-def get_images_text(question):
+    else: 
+        return{
+            "knn": {
+                "combined_embedding": {
+                    "vector": embeddings_img[0].detach().numpy(),
+                    "k": 3
+                }
+            }
+        }
+
+def get_images_text(question,profile=None):
 
     '''
     This function retrieves the embeddings for an input image  and input text using the CLIP model, and returns a query that can be
@@ -92,16 +121,46 @@ def get_images_text(question):
     inputs = tokenizer([question], padding=True, return_tensors="pt")
     text_features = F.normalize(model.get_text_features(**inputs))
     text_embeds = text_features[0].detach().numpy().tolist()
-    embeds = torch.tensor(embeddings_img[0].detach().numpy()+ np.array(text_embeds))
-    comb_embeds = F.normalize(embeds, dim=0).to(torch.device('cpu')).numpy()
-    return{
-        "knn": {
-            "combined_embedding": {
-                "vector": comb_embeds,
-                "k": 10
+
+    if profile !=None:
+        embedding_profile_image=0
+        embedding_profile_brand=0
+
+        for photo in profile["image"]:
+            pimg = Image.open(requests.get(photo, stream=True).raw)
+            profile_img = processor(images=pimg,return_tensors="pt")
+            embeddings_profileimg = F.normalize(model.get_image_features(**profile_img))
+            embedding_profile_image += embeddings_profileimg[0].detach().numpy()
+
+        for brand in profile["brand"]:
+            pbrand = tokenizer([brand], padding=True, return_tensors="pt")
+            brand_features = F.normalize(model.get_text_features(**pbrand))
+            embedding_profile_brand+=0.4*brand_features[0].detach().numpy()
+
+        profile_brand_embeds = embedding_profile_brand.tolist()
+        embeds = torch.tensor(embeddings_img[0].detach().numpy()+np.array(text_embeds)+ 0.4*embedding_profile_image+profile_brand_embeds)
+        comb_embeds = F.normalize(embeds, dim=0).to(torch.device('cpu')).numpy()
+
+        return{
+            "knn": {
+                "combined_embedding": {
+                    "vector": comb_embeds,
+                    "k": 3
+                }
             }
         }
-    }
+    
+    else:
+        embeds = torch.tensor(embeddings_img[0].detach().numpy()+ np.array(text_embeds))
+        comb_embeds = F.normalize(embeds, dim=0).to(torch.device('cpu')).numpy()
+        return{
+            "knn": {
+                "combined_embedding": {
+                    "vector": comb_embeds,
+                    "k": 3
+                }
+            }
+        }
 
 def profile_query(womenProfile, menProfile, kidsProfile, beautyProfile, categ):
    query = {'should': [], 'must': []}
