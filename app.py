@@ -99,26 +99,7 @@ def hello():
    return json.jsonify(response)
 
    
-def random_query():
-   return {
-      "size": 120,
-   }
 
-@app.route('/profile',methods = ['POST', 'OPTIONS'])
-@cross_origin()
-def profile_category():
-   jsonData = json.loads(request.data)
-   print(jsonData)
-
-
-
-# Generate random items for profile creation
-@app.route('/random_items',methods = ['GET','OPTIONS'])
-@cross_origin()
-def random_items():
-   response = client.search(body = random_query(),index = index_name)
-   textReponse = responseToText(response['hits']['hits'])
-   return json.jsonify(textReponse)
       
 
 @app.route('/profile',methods = ['POST','OPTIONS'])
