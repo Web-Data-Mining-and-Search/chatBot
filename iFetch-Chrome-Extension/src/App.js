@@ -5,7 +5,7 @@ import { StyleSheet, ScrollView, View } from "react-native";
 
 // const MESSAGES_ENDPOINT = "https://ifetch.novasearch.org/agent/"
 const MESSAGES_ENDPOINT = "http://127.0.0.1:4000";
-const RANDOM_ITEM_ENDPOINT = MESSAGES_ENDPOINT + "/random_items";
+const PROFILE_ENDPOINT = MESSAGES_ENDPOINT + "/profile";
 
 function Recomenadation(props) {
     const recommendations = props.message.recommendations;
@@ -206,17 +206,44 @@ function App() {
         setShowContent(!showContent);
     };
 
+    const [profile, setProfile] = useState({
+        women: false,
+        men: false,
+        kids: false,
+        beauty: false,
+        state: "tops",
+        products: [],
+    });
 
-    const randomItem = async () => {
-        const response = await fetch(RANDOM_ITEM_ENDPOINT, {
-            method: "GET",
+    const randomItem = async (item,state) => {
+        if (item != null) {
+            //get the inner Html of every button in item
+            for (var i = 0; i < item.length; i++) {
+                var innerHtml = item[i].innerHTML;
+                if (innerHtml === "Women") profile.women = true;
+                if (innerHtml === "Men") profile.men = true;
+                if (innerHtml === "Kids") profile.kids = true;
+                if (innerHtml === "Beauty") profile.beauty = true;
+            }
+        }
+        profile.state = state;
+        const response = await fetch(PROFILE_ENDPOINT, {
+            method: "POST",
             headers: {
                 "Content-type": "application/json",
             },
+            //add profile to the request in a json format
+            body: JSON.stringify({ 
+                women : profile.women,
+                men : profile.men,
+                kids : profile.kids,
+                beauty : profile.beauty,
+                state : profile.state,
+            }),
         })
             .then((response) => response.json())
             .then((data) => {
-                console.log(data.recommendations);
+                console.log(data);
                 return data.recommendations;
             })
             .catch((err) => {  
@@ -229,44 +256,70 @@ function App() {
     
 
     function setStartSelectingLikedItem () {
+        // Get the number of selected items
+        const selectedItems = document.getElementsByClassName("button-category-selected");
+        // If there are no selected items, show a message
+        if (selectedItems.length == 0) {
+            const buttonContainer = document.getElementsByClassName("button-category-container")[0];
+            const message = document.createElement("div");
+            message.className = "alert-message";
+            message.innerHTML = "Please select at least one category";
+            if (buttonContainer.childElementCount == 5) {
+                buttonContainer.appendChild(message);
+                return;
+            }
+        }
+        
+        const randomProduct = randomItem(selectedItems, "tops");
+        //deleting the previous button
+        const buttonContainer = document.getElementsByClassName("button-category-container")[0];
+        buttonContainer.innerHTML = "";
         //wait for the profile image to be loaded
-        const randomProduct = randomItem();
         randomProduct.then((data) => {
-            const container = document.getElementById("content-container");
-            //replace the content-container by a grid of card 
-            container.className = "grid-container";
-            //add a title that says "Select your favorite product" and take the whole top row
-            const title = document.createElement("div");
-            title.className = "title";
-            title.innerHTML = "Select your favorite product";
-            title.style.gridColumn = "1 / span 3";
-            container.appendChild(title);
-            for (let i = 0; i < 120; i++) {
-                const card = document.createElement("div");
-                card.className = "card";
-                card.id = i;
-                card.onclick = () => {
-                    selectCard(card);
-                };
-                const img = document.createElement("img");
-                img.src = data[i].image_path;
-                card.appendChild(img);
-                const title = document.createElement("div");
-                title.className = "title-card";
-                title.innerHTML = data[i].brand + " " + data[i].name;
-                card.appendChild(title);
-                container.appendChild(card);
-            }
-            //add a fix button in middle of the bottom
-            const button = document.createElement("button");
-            button.className = "Done-button";
-            button.innerHTML = "Validate";
-            button.onclick = () => {
-                createProfile();
-            }
-            container.appendChild(button);
+            createItemList(data);
         });
     };
+
+
+    function createItemList(data){
+        const container = document.getElementById("content-container");
+        if (container.childElementCount > 0) {
+            container.removeChild(container.lastChild);
+        }
+        //replace the content-container by a grid of card 
+        container.className = "grid-container";
+        //add a title that says "Select your favorite product" and take the whole top row
+        const title = document.createElement("div");
+        title.className = "title-list";
+        title.id = "title-list";
+        title.innerHTML = "Select your favorite product";
+        title.style.gridColumn = "1 / span 3";
+        container.appendChild(title);
+        for (let i = 0; i < data.length; i++) {
+            const card = document.createElement("div");
+            card.className = "card";
+            card.id = i;
+            card.onclick = () => {
+                selectCard(card);
+            };
+            const img = document.createElement("img");
+            img.src = data[i].image_path;
+            card.appendChild(img);
+            const title = document.createElement("div");
+            title.className = "title-card";
+            title.innerHTML = data[i].brand;
+            card.appendChild(title);
+            container.appendChild(card);
+        }
+        //add a fix button in middle of the bottom
+        const button = document.createElement("button");
+        button.className = "Done-button";
+        button.innerHTML = "Validate";
+        button.onclick = () => {
+            createProfile();
+        }
+        container.appendChild(button);
+    }
 
     function setStartSelectingProfile(){
         const container = document.getElementById("content-container");
@@ -304,10 +357,23 @@ function App() {
             selectItem(beautyButton);
         }
         buttonContainer.appendChild(beautyButton);
+        //add a button to validate the selection
+        const button = document.createElement("button");
+        button.className = "Done-button-category";
+        button.innerHTML = "Validate";
+        button.onclick = () => {
+            setStartSelectingLikedItem();
+        }
+        buttonContainer.appendChild(button);
         container.appendChild(buttonContainer);
     }
 
     const selectItem = (item) => {
+        //delete the message if exist
+        const buttonContainer = document.getElementsByClassName("button-category-container")[0];
+        if (buttonContainer.childElementCount == 6) {
+            buttonContainer.removeChild(buttonContainer.lastChild);
+        }
         // if the card is already selected, unselect it
         if (item.className === "button-category-selected") {
             item.className = "button-category";
@@ -322,13 +388,57 @@ function App() {
         const cards = document.getElementsByClassName("card-selected");
         const selectedCards = [];
         for (let i = 0; i < cards.length; i++) {
-            selectedCards.push(cards[i].id);
+            const tempCard = {
+                brand: cards[i].children[1].innerHTML,
+                image_path: cards[i].children[0].src
+            }
+            profile.products.push(tempCard);
         }
         //send the selected cards to the backend
-        console.log(selectedCards);
+        if (cards.length == 0) {
+            const container = document.getElementById("content-container");
+            const message = document.createElement("div");
+            message.className = "alert-message";
+            message.innerHTML = "Please select at least one product";
+            message.style.gridColumn = "1 / span 3";
+            container.scrollTo(0, 0);
+            if (container.childElementCount == 33) {
+                return;
+            }
+            // container is a grid container append message under the title
+            container.insertBefore(message, container.children[1]);
+            return;
+        } else {
+            const container = document.getElementById("content-container");
+            container.innerHTML = "";
+            //create a new request to the backend for the pants or the shoes
+            if (profile.state === "tops"){
+                const randomProduct = randomItem(null, "pants");
+                //wait for the profile image to be loaded
+                console.log(randomProduct);
+                randomProduct.then((data) => {
+                    createItemList(data);
+                });
+            } else if (profile.state === "pants"){
+                const randomProduct = randomItem(null, "shoes");
+                //wait for the profile image to be loaded
+                randomProduct.then((data) => {
+                    createItemList(data);
+                });
+            } else if (profile.state === "shoes"){
+                //create the profile
+                console.log("create profile with the following data");
+                console.log(profile);
+                setChatbox();
+            }
+        }
     }
 
     const selectCard = (card) => {
+        if (document.getElementsByClassName("alert-message")[0]) {
+            const container = document.getElementById("content-container");
+            container.removeChild(container.children[1]);
+        }
         // if the card is already selected, unselect it
         if (card.className === "card-selected") {
             card.className = "card";

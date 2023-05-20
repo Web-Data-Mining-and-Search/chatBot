@@ -111,6 +111,7 @@ def profile():
    kidsProfile = jsonData.get('kids')
    beautyProfile = jsonData.get('beauty')
    stateOfProfile = jsonData.get('state')
+   print(stateOfProfile, womenProfile, menProfile, kidsProfile, beautyProfile)
    if stateOfProfile == 'tops':
       responseTops = client.search(body = profile_query(womenProfile, menProfile, kidsProfile, beautyProfile, "T-Shirts & Vests"),index = index_name)
       textresponseTops = responseToProfil(responseTops['hits']['hits'])

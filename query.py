@@ -125,6 +125,13 @@ def profile_query(womenProfile, menProfile, kidsProfile, beautyProfile, categ):
                "fields": 'product_family',
             }
       })
+   elif categ == 'Pants':
+    query['must'].append({
+        "multi_match": {
+            "query": 'Trousers',
+            "fields": 'product_category',
+        }
+   })
    else:
       query['must'].append({
             "multi_match": {
@@ -133,8 +140,11 @@ def profile_query(womenProfile, menProfile, kidsProfile, beautyProfile, categ):
             }
       })
    return {
-        'size': 20,
-        '_source': ['product_gender', 'product_category', 'product_family'],
+        'size': 30,
+        '_source': ['product_id', 'product_family', 'product_category', 'product_sub_category', 'product_gender', 
+                    'product_main_colour', 'product_second_color', 'product_brand', 'product_materials', 
+                    'product_short_description', 'product_attributes', 'product_image_path', 
+                    'product_highlights', 'outfits_ids', 'outfits_products'],
         'query': {
             'bool': {
                 'must': query['must'],

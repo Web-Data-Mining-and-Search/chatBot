@@ -140,7 +140,7 @@ html,body {
 }
 
 .title-container {
-  background-color: #000000;
+  background-color: #222222;
   padding: 12px 20px;
 }
 
@@ -274,7 +274,7 @@ img {
 }
 
 .chat-button{
-  background-color: #000000;
+  background-color: #222222;
   color: #ffffff;
   border: none;
   border-radius: 10px;
@@ -316,7 +316,7 @@ img {
 .card {
   padding: 20px 0;
   text-align: center;
-  color: #000000;
+  color: #222222;
 }
 
 .title-card{
@@ -338,7 +338,7 @@ img {
   bottom: 15px;
   transform: translateX(-50%);
   left: 50%;
-  background-color: #000000;
+  background-color: #222222;
   color: #ffffff;
   font-weight: 700;
   border: none;
@@ -350,7 +350,7 @@ img {
   cursor: pointer;
 }
 
-.title{
+.title-list{
   font-size: 20px;
   font-weight: bold;
   text-align: center;
@@ -358,6 +358,7 @@ img {
 }
 
 .button-category-container {
+  padding-top: 20%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -365,9 +366,9 @@ img {
 }
 
 .button-category{
-  background-color: #000000;
-  color: #ffffff;
-  border: none;
+  background-color: #ffffff;
+  border: 2px solid #222222;
+  color: #222222;
   border-radius: 10px;
   padding: 10px 20px;
   text-align: center;
@@ -378,7 +379,36 @@ img {
   font-weight: 700;
 }
 
+.Done-button-category{
+  z-index: 11;
+  margin-top: 30px;
+  background-color: #222222;
+  color: #ffffff;
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
 .button-category-selected{
+  background-color: #ffffff;
+  color: #222222;
+  border: 2px solid #ff0000;
+  border-radius: 10px;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+  margin: 10px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.alert-message{
   background-color: #ff0000;
   color: #ffffff;
   border: none;
