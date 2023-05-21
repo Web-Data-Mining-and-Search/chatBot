@@ -39,6 +39,10 @@ function Recomenadation(props) {
             const temp = {
                 brand: Recomenadation.brand,
                 image_path: Recomenadation.image_path,
+                id: Recomenadation.id,
+                main_color: Recomenadation.main_color,
+                second_color: Recomenadation.second_color,
+                material: Recomenadation.material,
             }
             profile.products.push(temp);
         } else {
@@ -49,7 +53,7 @@ function Recomenadation(props) {
             }
 
             profile.products = profile.products.filter((product) => {
-                return product.brand !== temp.brand;
+                return product.id !== Recomenadation.id;
             }
             );
         }
@@ -216,8 +220,10 @@ async function SendMessage(
     selectedId,
     respondeCallback,
     image = null,
-    isUpToDate = false
+    isUpToDate = false,
+    profile,
 ) {
+    console.log(profile);
     const response = await fetch(MESSAGES_ENDPOINT, {
         method: "POST",
         body: JSON.stringify({
@@ -227,6 +233,7 @@ async function SendMessage(
             user_action: userAction, // The users action
             interface_selected_product_id: selectedId, // the ID of the opened product
             file: image, // the image uploaded by the user
+            profile: profile, // the profile of the user
             // document: document // The HTML of the page
         }),
         headers: {
@@ -387,6 +394,7 @@ function App() {
                 selectCard(card);
                 likeButton(heartButton);
             };
+            card.data = data[i];
             const title = document.createElement("div");
             title.className = "title-card";
             title.innerHTML = data[i].brand;
@@ -470,8 +478,12 @@ function App() {
         const cards = document.getElementsByClassName("card-selected");
         for (let i = 0; i < cards.length; i++) {
             const tempCard = {
-                brand: cards[i].children[1].innerHTML,
-                image_path: cards[i].children[0].children[0].src,
+                brand: cards[i].data.brand,
+                image_path: cards[i].data.image_path,
+                main_color: cards[i].data.main_color,
+                second_color: cards[i].data.second_color,
+                material: cards[i].data.material,
+                id: cards[i].data.id
             }
             profile.products.push(tempCard);
         }
@@ -559,7 +571,8 @@ function App() {
             recommendations: [],
         };
 
-        setMessages([...messages, temp]);
+        setMessages((messages) => [...messages, temp]);
+        console.log(messages);
         SendMessage(
             message,
             userID,
@@ -567,7 +580,9 @@ function App() {
             "",
             "",
             recieveMessage,
-            selectedImage
+            selectedImage,
+            true,
+            profile,
         );
         setSelectedImage(null);
         inputRef.current.value = null;
@@ -585,7 +600,8 @@ function App() {
         };
 
         if (isUpToDate) {
-            setMessages([...messages, temp1]);
+            setMessages((messages) => [...messages, temp1]);
+            console.log(messages);
             return;
         }
 
@@ -594,8 +610,8 @@ function App() {
             utterance: utterance,
             recommendations: [],
         };
-
-        setMessages([...messages, temp2, temp1]);
+        setMessages((messages) => [...messages, temp1, temp2]);
+        console.log(messages);
     };
 
     useEffect(() => {
@@ -607,7 +623,8 @@ function App() {
             "",
             recieveMessage,
             null,
-            true
+            true,
+            profile,
         );
         initialMessage();
     }, []);
@@ -680,7 +697,7 @@ function App() {
                 imgContainer.appendChild(heartButton);
                 card.appendChild(imgContainer);
                 card.onclick = () => {
-                    likeButtonProfile(profile.products[i].image_path, heartButton, profile.products[i].brand);
+                    likeButtonProfile(heartButton, profile.products[i]);
                 };
                 const title = document.createElement("div");
                 title.className = "title-card";
@@ -693,16 +710,23 @@ function App() {
 
     }
 
-    function likeButtonProfile(imgPath,button,brand){
+    function likeButtonProfile(button,data){
         if (button.className === "heart-button__liked") {
             button.className = "heart-button";
             profile.products = profile.products.filter((product) => {
-                return product.image_path !== imgPath;
+                return product.id !== data.id;
             });
         } 
         else {
             button.className = "heart-button__liked";
-            profile.products.push({ image_path: imgPath , brand: brand});
+            profile.products.push({
+                id: data.id,
+                brand: data.brand,
+                image_path: data.image_path,
+                main_color: data.main_color,
+                second_color: data.second_color,
+                material: data.material,
+            });
         }
     }
 
