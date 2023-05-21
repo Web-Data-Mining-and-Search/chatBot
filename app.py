@@ -107,16 +107,20 @@ def hello():
             'material' : 'Coton',
          }
       }'''
-
+   profile={'brand':[],'image':[], 'id':[], 'main_color':[], 'second_color':[], 'material':[]}
+   if pre_profile:
+      for key, value in pre_profile.items():
+         profile['brand'].append(value['brand'])
+         profile['image'].append(value['image_path'])
+         profile['id'].append(value['id'])
+         profile['main_color'].append(value['main_color'])
+         profile['second_color'].append(value['second_color'])
+         profile['material'].append(value['material'])
 
    if base64Image:
       write_out(base64Image)
       has_image = True
    parsed_question = parse_question(question)
-   profile={}
-   profile["image"]=["https://large.novasearch.org/farfetch_products/images/16/41/17/65/16411765.jpg","https://large.novasearch.org/farfetch_products/images/16/64/39/73/16643973.jpg","https://large.novasearch.org/farfetch_products/images/16/62/43/45/16624345.jpg"]
-   profile["brand"]=["prada","hugo boss","massimo duti"]
-   #profile=None
    #get the response from the model
    response = get_response(parsed_question, has_image, question,profile)
    return json.jsonify(response)
