@@ -90,6 +90,7 @@ def hello():
    question = jsonData.get('utterance')
    base64Image = jsonData.get('file')
    pre_profile = jsonData.get('profile')
+
    '''{
          {
             'brand' :'Gucci',
@@ -117,10 +118,12 @@ def hello():
          profile['second_color'].append(value['second_color'])
          profile['material'].append(value['material'])
 
+
    if base64Image:
       write_out(base64Image)
       has_image = True
    parsed_question = parse_question(question)
+
    #get the response from the model
    response = get_response(parsed_question, has_image, question,profile)
    return json.jsonify(response)

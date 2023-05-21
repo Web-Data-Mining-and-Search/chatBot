@@ -64,22 +64,37 @@ def get_similar_images(profile=None):
     embeddings_img = F.normalize(model.get_image_features(**input_img))
 
     if profile !=None:
-        embedding_profile=0
+        embedding_profile_image=0
         embedding_profile_brand=0
+        embedding_profile_material=0
+        embedding_profile_color=0
+
         for photo in profile["image"]:
             pimg = Image.open(requests.get(photo, stream=True).raw)
             profile_img = processor(images=pimg,return_tensors="pt")
             embeddings_profileimg = F.normalize(model.get_image_features(**profile_img))
-            embedding_profile += embeddings_profileimg[0].detach().numpy()
+            embedding_profile_image += embeddings_profileimg[0].detach().numpy()
 
         for brand in profile["brand"]:
             pbrand = tokenizer([brand], padding=True, return_tensors="pt")
             brand_features = F.normalize(model.get_text_features(**pbrand))
-            embedding_profile_brand+=0.2*brand_features[0].detach().numpy()
+            embedding_profile_brand+=0.05*brand_features[0].detach().numpy()
+        
+        for material in profile["material"]:
+            pmaterial = tokenizer([material], padding=True, return_tensors="pt")
+            material_features = F.normalize(model.get_text_features(**pmaterial))
+            embedding_profile_material+=0.05*material_features[0].detach().numpy()
+
+        for color in profile["main_color"]:
+            pcolor = tokenizer([color], padding=True, return_tensors="pt")
+            color_features = F.normalize(model.get_text_features(**pcolor))
+            embedding_profile_color+=0.5*color_features[0].detach().numpy()
 
         profile_brand_embeds = embedding_profile_brand.tolist()
+        profile_material_embeds = embedding_profile_material.tolist()
+        profile_main_color_embeds = embedding_profile_color.tolist()
 
-        embeds = torch.tensor(embeddings_img[0].detach().numpy()+ 0.2*embedding_profile+ profile_brand_embeds)
+        embeds = torch.tensor(embeddings_img[0].detach().numpy()+ profile_brand_embeds+profile_material_embeds+profile_main_color_embeds)
         comb_embeds = F.normalize(embeds, dim=0).to(torch.device('cpu')).numpy()
         return{
             "knn": {
@@ -125,6 +140,8 @@ def get_images_text(question,profile=None):
     if profile !=None:
         embedding_profile_image=0
         embedding_profile_brand=0
+        embedding_profile_color=0
+        embedding_profile_material=0
 
         for photo in profile["image"]:
             pimg = Image.open(requests.get(photo, stream=True).raw)
@@ -135,10 +152,22 @@ def get_images_text(question,profile=None):
         for brand in profile["brand"]:
             pbrand = tokenizer([brand], padding=True, return_tensors="pt")
             brand_features = F.normalize(model.get_text_features(**pbrand))
-            embedding_profile_brand+=0.4*brand_features[0].detach().numpy()
+            embedding_profile_brand+=0.05*brand_features[0].detach().numpy()
+        
+        for material in profile["material"]:
+            pmaterial = tokenizer([material], padding=True, return_tensors="pt")
+            material_features = F.normalize(model.get_text_features(**pmaterial))
+            embedding_profile_material+=0.05*material_features[0].detach().numpy()
 
+        for color in profile["main_color"]:
+            pcolor = tokenizer([color], padding=True, return_tensors="pt")
+            color_features = F.normalize(model.get_text_features(**pcolor))
+            embedding_profile_color+=0.05*color_features[0].detach().numpy()
+
+        profile_main_color_embeds = embedding_profile_color.tolist()
+        profile_material_embeds = embedding_profile_material.tolist()
         profile_brand_embeds = embedding_profile_brand.tolist()
-        embeds = torch.tensor(embeddings_img[0].detach().numpy()+np.array(text_embeds)+ 0.4*embedding_profile_image+profile_brand_embeds)
+        embeds = torch.tensor(embeddings_img[0].detach().numpy()+np.array(text_embeds)+ 0.4*embedding_profile_image+profile_brand_embeds+profile_material_embeds+profile_main_color_embeds)
         comb_embeds = F.normalize(embeds, dim=0).to(torch.device('cpu')).numpy()
 
         return{
