@@ -223,7 +223,6 @@ async function SendMessage(
     isUpToDate = false,
     profile,
 ) {
-    console.log(profile);
     const response = await fetch(MESSAGES_ENDPOINT, {
         method: "POST",
         body: JSON.stringify({
@@ -242,7 +241,6 @@ async function SendMessage(
     })
         .then((response) => response.json())
         .then((data) => {
-            console.log(data);
             respondeCallback(data, utterance, isUpToDate);
         })
         .catch((err) => {
@@ -311,7 +309,6 @@ function App() {
         })
             .then((response) => response.json())
             .then((data) => {
-                console.log(data);
                 return data.recommendations;
             })
             .catch((err) => {  
@@ -572,7 +569,6 @@ function App() {
         };
 
         setMessages((messages) => [...messages, temp]);
-        console.log(messages);
         SendMessage(
             message,
             userID,
@@ -601,7 +597,6 @@ function App() {
 
         if (isUpToDate) {
             setMessages((messages) => [...messages, temp1]);
-            console.log(messages);
             return;
         }
 
@@ -611,7 +606,6 @@ function App() {
             recommendations: [],
         };
         setMessages((messages) => [...messages, temp1, temp2]);
-        console.log(messages);
     };
 
     useEffect(() => {
@@ -653,7 +647,6 @@ function App() {
         setChatbox();
         // wait for the change to apply
         setTimeout(() => {
-            console.log(showContent);
             const container = document.getElementById("content-container");
             container.innerHTML = "";
             container.className = "profile-container";
