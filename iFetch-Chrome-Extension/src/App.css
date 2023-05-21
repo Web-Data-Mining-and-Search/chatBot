@@ -143,7 +143,16 @@ html,body {
 
 .title-container {
   background-color: #222222;
+  width: calc(100% - 40px);
   padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title-container i{
+  color: #f8f8f8;
+  font-size: 1.5em;
 }
 
 .App {
@@ -307,6 +316,14 @@ img {
   font-size: 14px;
 }
 
+.profile-content-container-grid {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  grid-gap: 10px;
+  overflow: auto;
+  max-height: 462px;
+}
+
 .grid-container {
   display: grid;
   grid-template-columns: auto auto auto;
@@ -316,11 +333,15 @@ img {
 }
 
 .card {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
   padding: 20px 0;
   text-align: center;
   border: 2px solid transparent;
   border-radius: 5px;
   z-index: 10;
+  max-width: 109px;
 }
 
 .title-card{
@@ -330,6 +351,10 @@ img {
 }
 
 .card-selected {
+  max-width: 109px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
   padding: 20px 0;
   text-align: center;
   border: 2px solid #ff0000;
