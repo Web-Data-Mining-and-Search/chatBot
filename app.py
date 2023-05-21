@@ -109,14 +109,21 @@ def hello():
          }
       }'''
    profile={'brand':[],'image':[], 'id':[], 'main_color':[], 'second_color':[], 'material':[]}
+
    if pre_profile:
-      for key, value in pre_profile.items():
-         profile['brand'].append(value['brand'])
-         profile['image'].append(value['image_path'])
-         profile['id'].append(value['id'])
-         profile['main_color'].append(value['main_color'])
-         profile['second_color'].append(value['second_color'])
-         profile['material'].append(value['material'])
+         for element in pre_profile['products']:
+            profile['brand'].append(element['brand'])
+            profile['image'].append(element['image_path'])
+            profile['id'].append(element['id'])
+            profile['main_color'].append(element['main_color'])
+            profile['second_color'].append(element['second_color'])
+            profile['material'].append(element['material'])
+   tmp=[]
+   for list in profile['material']:
+      for element in list:
+         tmp.append(element)
+   profile['material']=tmp
+   print(profile)
 
 
    if base64Image:
