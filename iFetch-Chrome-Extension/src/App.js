@@ -252,6 +252,7 @@ function randomNumberInRange(min, max) {
 }
 
 function App() {
+
     const [messages, setMessages] = useState([]);
     const [showContent, setShowContent] = useState(false);
     const [userID, setUserID] = useState(`${randomNumberInRange(0, 10000)}`);
@@ -263,7 +264,7 @@ function App() {
     const inputRef = useRef(null);
 
     const setChatbox = () => {
-        setShowContent(!showContent);
+        setShowContent((prev) => !prev);
     };
 
     const [profile, setProfile] = useState({
@@ -370,7 +371,6 @@ function App() {
             const card = document.createElement("div");
             card.className = "card";
             card.id = i;
-            
             const imgContainer = document.createElement("div");
             imgContainer.className = "img-container";
             const img = document.createElement("img");
@@ -468,11 +468,10 @@ function App() {
     function createProfile() {
         //get all the selected cards
         const cards = document.getElementsByClassName("card-selected");
-        const selectedCards = [];
         for (let i = 0; i < cards.length; i++) {
             const tempCard = {
                 brand: cards[i].children[1].innerHTML,
-                image_path: cards[i].children[0].src,
+                image_path: cards[i].children[0].children[0].src,
             }
             profile.products.push(tempCard);
         }
@@ -497,7 +496,6 @@ function App() {
             if (profile.state === "tops"){
                 const randomProduct = randomItem(null, "pants");
                 //wait for the profile image to be loaded
-                console.log(randomProduct);
                 randomProduct.then((data) => {
                     createItemList(data);
                 });
@@ -628,11 +626,84 @@ function App() {
 
     function setChatbot(){
         const container = document.getElementById("content-container");
-        container.removeChild(document.getElementsByClassName("logo-container")[0]);
-        container.removeChild(document.getElementsByClassName("button-container")[0]);
-        container.removeChild(document.getElementsByClassName("continue-container")[0]);
-        container.className = "chat-container";
+        container.innerHTML = "";
         setChatbox();
+    }
+
+
+    function setProfilePage(){
+        if (!showContent) return;
+        setChatbox();
+        // wait for the change to apply
+        setTimeout(() => {
+            console.log(showContent);
+            const container = document.getElementById("content-container");
+            container.innerHTML = "";
+            container.className = "profile-container";
+            const titleContainer = document.createElement("div");
+            titleContainer.className = "title-container";
+            const title = document.createElement("h1");
+            title.className = "message-content-bot";
+            title.innerHTML = "iFetch";
+            const icon = document.createElement("i");
+            icon.classList.add("far");
+            icon.classList.add("fa-comments");
+            icon.onclick = setChatbot;
+            titleContainer.appendChild(title);
+            titleContainer.appendChild(icon);
+            container.appendChild(titleContainer);
+            const profileContainer = document.createElement("div");
+            profileContainer.className = "profile-content-container-grid";
+            const profileTitle = document.createElement("div");
+            profileTitle.className = "title-list";
+            profileTitle.id = "title-list";
+            profileTitle.innerHTML = "Your favorite products";
+            profileTitle.style.gridColumn = "1 / span 3";
+            if (profile.products.length === 0) {
+                profileTitle.innerHTML = "You have not liked any product yet";
+            }
+            profileContainer.appendChild(profileTitle);
+            for (let i = 0; i < profile.products.length; i++) {
+                const card = document.createElement("div");
+                card.className = "card";
+                card.id = i;
+                const imgContainer = document.createElement("div");
+                imgContainer.className = "img-container";
+                const img = document.createElement("img");
+                img.src = profile.products[i].image_path;
+                imgContainer.appendChild(img);
+                const heartButton = document.createElement("button");
+                heartButton.className = "heart-button__liked";
+                const heartIcon = document.createElement("i");
+                heartIcon.className = "fas fa-heart";
+                heartButton.appendChild(heartIcon);
+                imgContainer.appendChild(heartButton);
+                card.appendChild(imgContainer);
+                card.onclick = () => {
+                    likeButtonProfile(profile.products[i].image_path, heartButton, profile.products[i].brand);
+                };
+                const title = document.createElement("div");
+                title.className = "title-card";
+                title.innerHTML = profile.products[i].brand
+                card.appendChild(title);
+                profileContainer.appendChild(card);
+            }
+            container.appendChild(profileContainer);
+        }, 200);
+
+    }
+
+    function likeButtonProfile(imgPath,button,brand){
+        if (button.className === "heart-button__liked") {
+            button.className = "heart-button";
+            profile.products = profile.products.filter((product) => {
+                return product.image_path !== imgPath;
+            });
+        } 
+        else {
+            button.className = "heart-button__liked";
+            profile.products.push({ image_path: imgPath , brand: brand});
+        }
     }
 
     return (
@@ -657,6 +728,7 @@ function App() {
                     <div className='chat-container'>
                         <div className='title-container'>
                             <h1 className='message-content-bot'>iFetch</h1>
+                            <i className="fas fa-user-circle fa-2x" onClick={setProfilePage}></i>
                         </div>
                         <View style={styles.container}>
                         <Messages messages={messages} app={profile}/>
