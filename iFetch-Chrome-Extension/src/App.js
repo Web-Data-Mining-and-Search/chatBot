@@ -9,10 +9,16 @@ const PROFILE_ENDPOINT = MESSAGES_ENDPOINT + "/profile";
 
 function Recomenadation(props) {
     const recommendations = props.message.recommendations;
+    const profile = props.app;
 
     const [img, setImg] = useState();
     const [index, setIndex] = useState(0);
     const message = recommendations[index].message;
+
+    var temp = {
+        brand: recommendations[index].brand,
+        image_path: recommendations[index].image_path,
+    }
 
     const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
@@ -23,11 +29,52 @@ function Recomenadation(props) {
         setImg(imageObjectURL);
         return imageObjectURL;
     };
-    
+
+    const like = (Recomenadation) => {
+        var product_id = Recomenadation.id;
+
+        const button = document.getElementById("heart-button" + product_id);
+        if (button.className === "heart-button") {
+            button.className = "heart-button__liked";
+            const temp = {
+                brand: Recomenadation.brand,
+                image_path: Recomenadation.image_path,
+            }
+            profile.products.push(temp);
+        } else {
+            button.className = "heart-button";
+            const temp = {
+                brand: Recomenadation.brand,
+                image_path: Recomenadation.image_path,
+            }
+
+            profile.products = profile.products.filter((product) => {
+                return product.brand !== temp.brand;
+            }
+            );
+        }
+    };
 
     var click = (dir) => {
+        const button = document.getElementById("heart-button" + recommendations[index].id);
+        if (isItemLiked(recommendations[clamp(index + dir * 1, 0, recommendations.length - 1)])) {
+            button.className = "heart-button__liked";
+        } else {
+            button.className = "heart-button";
+        }
         setIndex(clamp(index + dir * 1, 0, recommendations.length - 1));
     };
+
+    function isItemLiked(item) {
+        var found = false;
+        for (var i = 0; i < profile.products.length; i++) {
+            if (profile.products[i].image_path === item.image_path) {
+                found = true;
+                break;
+            }
+        }
+        return found;
+    }
 
     return (
         <div className="response">
@@ -40,20 +87,31 @@ function Recomenadation(props) {
             </div>
             <div className="landscape-view">
                 <button
-                    className={index == 0 ? "invisible-button" : "regular-arrows"}
+                    className={index === 0 ? "invisible-button" : "regular-arrows"}
                     onClick={() => {
                         click(-1);
                     }}
                 >
                     {"<"}
                 </button>
-                <img
-                    src={recommendations[index].image_path}
-                    onClick={() => {
-                        window.open(recommendations[index].product_url);
-                    }}
-                    style={{ alignSelf: "center" }}
-                />
+                <div className="image-container">
+                    <img
+                        src={recommendations[index].image_path}
+                        style={{ alignSelf: "center" }}
+                    />
+                    <button
+                        className={isItemLiked(recommendations[index]) ? "heart-button__liked" : "heart-button"}
+                        id={"heart-button" + recommendations[index].id}
+                        onClick={() => {
+                            like(recommendations[index]);
+                        }}
+                    >
+                        <i
+                            className="fas fa-heart"
+                        >
+                        </i>
+                    </button>
+                </div>
                 <button
                     className={
                         index == recommendations.length - 1
@@ -70,6 +128,8 @@ function Recomenadation(props) {
         </div>
     );
 }
+
+
 
 // function for printing a message
 function Message(props) {
@@ -91,7 +151,7 @@ function Message(props) {
                 {message.utterance}
             </div>
             {recommendations.length != 0 ? (
-                <Recomenadation message={message} is_user={is_user} />
+                <Recomenadation message={message} is_user={is_user} app={props.app} />
             ) : (
                 <></>
             )}
@@ -111,7 +171,7 @@ function Messages(props) {
             {props.messages.map((message, i) => {
                 return (
                     <View key={message.provider_id + i}>
-                        <Message message={message} />
+                        <Message message={message} app={props.app}/>
                     </View>
                 );
             })}
@@ -280,6 +340,17 @@ function App() {
         });
     };
 
+    function likeButton(button) {
+        if (button.className === "heart-button") {
+            button.className = "heart-button__liked";
+            return;
+        }
+        if (button.className === "heart-button__liked") {
+            button.className = "heart-button";
+            return;
+        }
+    }
+
 
     function createItemList(data){
         const container = document.getElementById("content-container");
@@ -299,12 +370,23 @@ function App() {
             const card = document.createElement("div");
             card.className = "card";
             card.id = i;
-            card.onclick = () => {
-                selectCard(card);
-            };
+            
+            const imgContainer = document.createElement("div");
+            imgContainer.className = "img-container";
             const img = document.createElement("img");
             img.src = data[i].image_path;
-            card.appendChild(img);
+            imgContainer.appendChild(img);
+            const heartButton = document.createElement("button");
+            heartButton.className = "heart-button";
+            const heartIcon = document.createElement("i");
+            heartIcon.className = "fas fa-heart";
+            heartButton.appendChild(heartIcon);
+            imgContainer.appendChild(heartButton);
+            card.appendChild(imgContainer);
+            card.onclick = () => {
+                selectCard(card);
+                likeButton(heartButton);
+            };
             const title = document.createElement("div");
             title.className = "title-card";
             title.innerHTML = data[i].brand;
@@ -390,7 +472,7 @@ function App() {
         for (let i = 0; i < cards.length; i++) {
             const tempCard = {
                 brand: cards[i].children[1].innerHTML,
-                image_path: cards[i].children[0].src
+                image_path: cards[i].children[0].src,
             }
             profile.products.push(tempCard);
         }
@@ -577,7 +659,7 @@ function App() {
                             <h1 className='message-content-bot'>iFetch</h1>
                         </div>
                         <View style={styles.container}>
-                        <Messages messages={messages}/>
+                        <Messages messages={messages} app={profile}/>
                         </View>
                         <div className='form-container'>
                         <SendMessageForm handleSubmit = {handleSubmit}/>

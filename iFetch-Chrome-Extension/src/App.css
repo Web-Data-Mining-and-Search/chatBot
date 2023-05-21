@@ -1,3 +1,5 @@
+
+
 html,body {
   height: 100%;
   width: 100%;
@@ -316,20 +318,23 @@ img {
 .card {
   padding: 20px 0;
   text-align: center;
-  color: #222222;
+  border: 2px solid transparent;
+  border-radius: 5px;
+  z-index: 10;
 }
 
 .title-card{
   font-size: 12px;
   font-weight: normal;
+  z-index: 11;
 }
 
 .card-selected {
   padding: 20px 0;
   text-align: center;
-  color: #ffffff;
   border: 2px solid #ff0000;
   border-radius: 5px;
+  z-index: 10;
 }
 
 .Done-button{
@@ -380,7 +385,7 @@ img {
 }
 
 .Done-button-category{
-  z-index: 11;
+  z-index: 20;
   margin-top: 30px;
   background-color: #222222;
   color: #ffffff;
@@ -420,4 +425,150 @@ img {
   margin: 10px;
   cursor: pointer;
   font-weight: 700;
+}
+
+.img-container{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-end;
+  position: relative;
+}
+
+.image-container{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-end;
+  position: relative;
+}
+
+.heart-button {
+  position: absolute;
+  z-index: 13;
+  margin: auto;
+  width: 50px;
+  height: 50px;
+  border: solid 3px #c8c8c8;
+  text-align: center;
+  font-size: 1.6rem;
+  line-height: 2.8rem;
+  color: #c8c8c8;
+  background-color: #f8f8f880;
+  border-radius: 50%;
+  text-decoration: none;
+  transition: all 300ms ease-in-out;
+  outline: none;
+  transform: scale(0.6);
+}
+.heart-button i {
+  position: relative;
+  z-index: 15;
+  transform-origin: bottom;
+}
+.heart-button:after {
+  content: "";
+  width: 44px;
+  height: 44px;
+  background: #ff5454;
+  position: absolute;
+  border-radius: 50%;
+  z-index: 13;
+  opacity: 0;
+  transform: scale(0.6);
+}
+.heart-button:before {
+  content: "\f004";
+  font-family: "Font Awesome 5 Free";
+  transition: all 300ms ease-in-out;
+  position: absolute;
+  text-align: center;
+  background-color: #f8f8f880;
+  opacity: 0;
+  font-size: 1.2rem;
+  transform: scale(0.6);
+}
+.heart-button:hover {
+  color: #ff5454;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+}
+.heart-button__liked {
+  position: absolute;
+  z-index: 13;
+  margin: auto;
+  width: 50px;
+  height: 50px;
+  border: solid 3px #ff5454;
+  text-align: center;
+  font-size: 1.6rem;
+  line-height: 2.8rem;
+  color:  #ff5454;
+  background-color:  #fff;
+  border-radius: 50%;
+  text-decoration: none;
+  transition: all 300ms ease-in-out;
+  outline: none;
+  transform: scale(0.6);
+}
+.heart-button__liked i {
+  position: relative;
+  z-index: 15;
+  transform-origin: bottom;
+}
+
+.heart-button__liked:after {
+  animation: scaleCircle 0.3s ease-in-out;
+}
+.heart-button__liked:before {
+  animation: heartBit 1s ease-in-out 0.3s;
+  content: "\f004";
+  font-family: "Font Awesome 5 Free";
+  transition: all 300ms ease-in-out;
+  position: absolute;
+  text-align: center;
+  opacity: 0;
+  font-size: 1.2rem;
+}
+.heart-button__liked:hover {
+  background: #fff;
+  color: #c8c8c8
+}
+
+@keyframes scaleCircle {
+  0% {
+    opacity: 0;
+    z-index: 14;
+  }
+  50% {
+    transform: scale(0.6);
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes heartBit {
+  0% {
+    top: 0;
+    opacity: 0;
+  }
+  25% {
+    top: -50px;
+    opacity: 1;
+  }
+  35% {
+    top: -40px;
+  }
+  55% {
+    top: -50px;
+  }
+  100% {
+    top: -80px;
+    opacity: 0;
+  }
 }

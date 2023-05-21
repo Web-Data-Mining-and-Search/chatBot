@@ -128,3 +128,5 @@ def profile():
       textresponsePants = responseToProfil(responsePants['hits']['hits'])
       return json.jsonify(textresponsePants)
 
+if __name__ == '__main__':
+   app.run(port=4000,debug=True)
