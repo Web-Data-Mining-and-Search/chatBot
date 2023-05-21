@@ -89,6 +89,26 @@ def hello():
    user_id = jsonData.get('user_id')
    question = jsonData.get('utterance')
    base64Image = jsonData.get('file')
+   pre_profile = jsonData.get('profile')
+   '''{
+         {
+            'brand' :'Gucci',
+            'id' : 1234,
+            'image_path' : 'http..',
+            'main_color' : 'Green',
+            'second_color' : 'Red',
+            'material' : 'Coton',
+         },{
+            'brand' :'Gucci',
+            'id' : 1234,
+            'image_path' : 'http..',
+            'main_color' : 'Green',
+            'second_color' : 'Red',
+            'material' : 'Coton',
+         }
+      }'''
+
+
    if base64Image:
       write_out(base64Image)
       has_image = True

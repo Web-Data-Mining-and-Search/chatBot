@@ -52,7 +52,11 @@ def responseToProfil(results):
             recommandation.append({
             'brand' : result['_source']['product_brand'],
             'id' : result['_source']['product_id'],
-            'image_path' : result['_source']['product_image_path'],}
+            'image_path' : result['_source']['product_image_path'],
+            'main_color' : result['_source']['product_main_colour'],
+            'second_color' : result['_source']['product_second_color'],
+            'material' : result['_source']['product_materials'],
+            }
         )
     return { 
         'recommendations' : recommandation,
