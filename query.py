@@ -228,7 +228,7 @@ def profile_query(womenProfile, menProfile, kidsProfile, beautyProfile, categ):
             }
       })
    return {
-        'size': 30,
+        'size': 1000,
         '_source': ['product_id', 'product_family', 'product_category', 'product_sub_category', 'product_gender', 
                     'product_main_colour', 'product_second_color', 'product_brand', 'product_materials', 
                     'product_short_description', 'product_attributes', 'product_image_path', 

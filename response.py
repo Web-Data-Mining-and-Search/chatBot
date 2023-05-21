@@ -1,4 +1,7 @@
 
+import random
+
+
 def description_product(result):
     brand= result['_source']['product_brand']
     category = result['_source']['product_category']
@@ -46,21 +49,22 @@ def responseToText(results):
         }
 
 def responseToProfil(results):
-    recommandation = []
-    if len(results) > 0:
-        for result in results:
-            recommandation.append({
+    random.shuffle(results)  # Mélangez les résultats de manière aléatoire
+    recommended_items = []
+    
+    for result in results[:20]:  # Sélectionnez les 20 premiers éléments après le mélange
+        recommended_items.append({
             'brand' : result['_source']['product_brand'],
             'id' : result['_source']['product_id'],
             'image_path' : result['_source']['product_image_path'],
             'main_color' : result['_source']['product_main_colour'],
             'second_color' : result['_source']['product_second_color'],
-            'material' : result['_source']['product_materials'],
-            }
-        )
-    return { 
-        'recommendations' : recommandation,
-        }
+            'material' : result['_source']['product_materials']
+        })
+    
+    return {
+        'recommendations': recommended_items
+    }
 
 
 # generate the response
