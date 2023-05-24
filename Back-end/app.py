@@ -7,6 +7,7 @@ from images import write_out
 from response import *
 from parsequestion import parse_question
 from query import *
+import dialogManager
 
 
 
@@ -44,6 +45,9 @@ app = Flask(__name__)
 app.permanent_session_lifetime = datetime.timedelta(days=365)
 cors=CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
+global stateDialogManager, previous_products
+stateDialogManager = "greetings"
+previous_products = []
 
 # make a request to the OpenSearch client
 
@@ -76,6 +80,7 @@ def get_response(question_dict, has_image,question=None,profile=None):
 @app.route('/',methods = ['POST', 'GET','OPTIONS'])
 @cross_origin()
 def hello():
+   global stateDialogManager,previous_products
    #get the first message from the user
    has_image = False
    jsonData = json.loads(request.data)
@@ -128,10 +133,14 @@ def hello():
    if base64Image:
       write_out(base64Image)
       has_image = True
-   parsed_question = parse_question(question)
-
+   intend,question_dict = parse_question(question)
+   
+   stateDialogManager,text,recommandations=dialogManager.generateResponseAndState(stateDialogManager,previous_products,intend,question_dict)
+   if recommandations:
+      previous_products=recommandations
    #get the response from the model
-   response = get_response(parsed_question, has_image, question,profile)
+   response = generate_response(text,recommandations)
+   print(response)
    return json.jsonify(response)
 
    
