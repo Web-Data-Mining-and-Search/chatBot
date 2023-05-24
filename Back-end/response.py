@@ -72,10 +72,10 @@ def responseToProfil(results):
 
 # generate the response
 
-def generate_response(text):
+def generate_response(text, products):
     return { 
         'has_response' : 'true',
-        'recommendations' : [],
+        'recommendations' : products,
         'response' : text,
         'system_action' : 'inform',
         }

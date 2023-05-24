@@ -49,51 +49,13 @@ def parse_question(questionText):
     output = model.get_human_readable_output(o, tokens)
 
     print(output.get_intent())
+    question_dict = {}
 
     for key in output.value.keys():
         value = output.get_slot_value_from_key(key)
         print(key + " = " + value)
-    requests = questionText.split(',')
-
-    parsed_should_question, parsed_must_question, parsed_must_not_question, parsed_filter_question = {}, {}, {}, {}
-    categories_list = ['id', 'family', 'category', 'subcategory', 'gender', 
-                'maincolour', 'secondcolour', 'brand', 'materials', 
-                'shortdescription', 'attributes']
-    
-
-    for request in requests:
-
-        if ':' not in request or request.count(':') > 1:
-            print("Error: invalid request: {}".format(request))
-            return None
-        
-        category_name, category_value = request.split(':')
-        category_name = category_name.strip().lower()
-        category_name = category_name.replace(" ", "")
-        category_value = category_value.strip().lower()
-
-        if not check_category(category_name, categories_list):
-            print("Error: invalid category: {}".format(category_name))
-            return None
-        
-        category_name = change_request(category_name)
-
-
-        if category_name.startswith('mustnot'):
-            parsed_must_not_question[category_name.replace("mustnot","")] = category_value
-        elif category_name.startswith('must'):
-            parsed_must_question[category_name.replace("must","")] = category_value
-        elif category_name.startswith('filter'):
-            parsed_filter_question[category_name.replace("filter","")] = category_value
-        else:
-            parsed_should_question[category_name] = category_value
-
-    return {
-        'must' : parsed_must_question,
-        'must_not' : parsed_must_not_question,
-        'should' : parsed_should_question,
-        'filter' : parsed_filter_question
-    }
+        question_dict[key] = value
+    return output.get_intent(), question_dict
 
 # Utility functions
 
