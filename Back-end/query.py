@@ -60,11 +60,14 @@ def get_text(question_dict,profile=None):
     for key,value in question_dict.items():
         print(key + value)
         key = "product_{}".format(unchange_request(key))
+        
+
         query['should'].append(
             {
             "multi_match": {
                "query": value,
                "fields": key,
+               "boost": 2
             }
       }
         )
@@ -78,6 +81,7 @@ def get_text(question_dict,profile=None):
                 "multi_match": {
                 "query": color,
                 "fields": field,
+                "boost": 0.5
                 }
                 }
             )
@@ -89,6 +93,7 @@ def get_text(question_dict,profile=None):
                 "multi_match": {
                 "query": brand,
                 "fields": field,
+                "boost": 0.5
                 }
                 }
             )
@@ -100,6 +105,7 @@ def get_text(question_dict,profile=None):
                 "multi_match": {
                 "query": brand,
                 "fields": field,
+                "boost": 0.5
                 }
                 }
             )
