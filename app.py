@@ -63,10 +63,10 @@ def get_response(question_dict, has_image,question=None,profile=None):
 
    if not question_dict and not has_image:
       return generate_response("I don't understand your question. Please ask me something else.")
-   print("query:")
-   print(get_query(question_dict, has_image,question,profile))
+   #print("query:")
+   #print(get_query(question_dict, has_image,question,profile))
    response = client.search(body = get_query(question_dict, has_image,question,profile),index = index_name)
-   print(response)
+   #print(response)
    textResponse = responseToText(response['hits']['hits'])
 
    return textResponse
@@ -109,7 +109,7 @@ def hello():
          }
       }'''
    profile={'brand':[],'image':[], 'id':[], 'main_color':[], 'second_color':[], 'material':[]}
-
+   
    if pre_profile:
          for element in pre_profile['products']:
             profile['brand'].append(element['brand'])
@@ -123,7 +123,7 @@ def hello():
       for element in list:
          tmp.append(element)
    profile['material']=tmp
-   print(profile)
+   
 
 
    if base64Image:
