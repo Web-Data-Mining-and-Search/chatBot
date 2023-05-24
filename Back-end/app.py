@@ -71,9 +71,8 @@ def get_response(question_dict, has_image,question=None,profile=None):
    print(get_query(question_dict, has_image,question,profile))
    response = client.search(body = get_query(question_dict, has_image,question,profile),index = index_name)
    print(response)
-   textResponse = responseToText(response['hits']['hits'])
 
-   return textResponse
+   return responseToText(response['hits']['hits'])
 
 
 # Handle the request
@@ -134,7 +133,8 @@ def hello():
       write_out(base64Image)
       has_image = True
    intend,question_dict = parse_question(question)
-   stateDialogManager,text,recommandations=dialogManager.generateResponseAndState(stateDialogManager,previous_products,intend,question_dict)
+   
+   stateDialogManager,text,recommandations=dialogManager.generateResponseAndState(stateDialogManager,previous_products,intend,question_dict,has_image,question,profile)
    if recommandations:
       previous_products=recommandations
    #get the response from the model
