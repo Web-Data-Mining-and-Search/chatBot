@@ -134,7 +134,6 @@ def hello():
       write_out(base64Image)
       has_image = True
    intend,question_dict = parse_question(question)
-   
    stateDialogManager,text,recommandations=dialogManager.generateResponseAndState(stateDialogManager,previous_products,intend,question_dict)
    if recommandations:
       previous_products=recommandations

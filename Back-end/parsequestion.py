@@ -16,6 +16,10 @@ tokenizer = AutoTokenizer.from_pretrained(checkpoint_name, truncation_side='left
 model, input_function, dataloading_function = get_model(checkpoint_name, tokenizer, None)
 
 
+tee_shirt= ['tee-shirt','tee-shirts','t-shirt','t-shirts','tee shirt','tee shirts','t shirt','t shirts']
+jean =['jean','jeans','pant','pants','denims']
+
+
 def add_special_tokens_to_model_and_tokenizer(model, tokenizer, special_tokens, embeddings):
     # TODO instead of checking for the shared param you should really just have a good way to tell whether the model has some sort of decoder
     if model is None or hasattr(model, 'shared'):
