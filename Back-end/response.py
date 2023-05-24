@@ -34,7 +34,7 @@ client = OpenSearch(
 
 # make a request to the OpenSearch client
 
-def getProductOpenSearch(question_dict, has_image,question=None,profile=None):
+def getProductOpenSearch(question_dict, has_image,profile=None):
     '''
     Returns a text response based on the given question dictionary and question image.
     
@@ -51,7 +51,7 @@ def getProductOpenSearch(question_dict, has_image,question=None,profile=None):
     if not question_dict and not has_image:
         return "I don't understand your question. Please ask me something else."
     
-    response = client.search(body = get_query(question_dict, has_image,question,profile),index = index_name)
+    response = client.search(body = get_query(question_dict, has_image,profile),index = index_name)
 
     return response['hits']['hits']
 

@@ -77,7 +77,7 @@ def hello():
    print("Previous products :"+str(previous_products))
 
    
-   stateDialogManager,text,recommendations,previous_products=dialogManager.generateResponseAndState(stateDialogManager,previous_products,intend,question_dict,has_image,profile,question)
+   stateDialogManager,text,recommendations,previous_products=dialogManager.generateResponseAndState(stateDialogManager,previous_products,intend,question_dict,has_image,profile)
 
    #get the response from the model
    response = generate_response(text,recommendations)

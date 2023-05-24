@@ -1,13 +1,13 @@
 import informative
 from response import *
 
-def generateResponseAndState(state,previous_products,intend,question_dict,has_image,profile,question):
+def generateResponseAndState(state,previous_products,intend,question_dict,has_image,profile):
     if state=="greetings":
-        return generateGreetingsResponse(intend,question_dict,has_image,profile,question)
+        return generateGreetingsResponse(intend,question_dict,has_image,profile)
     elif state=="retrieval":
-        return generateRetrievalResponse(intend,previous_products,question_dict,has_image,profile,question)
+        return generateRetrievalResponse(intend,previous_products,question_dict,has_image,profile)
     elif state=="information":
-        return generateInformationResponse(intend,previous_products,question_dict,has_image,profile,question)
+        return generateInformationResponse(intend,previous_products,question_dict,has_image,profile)
     elif state=="exit":
         return generateExitResponse()
     else:
@@ -15,7 +15,7 @@ def generateResponseAndState(state,previous_products,intend,question_dict,has_im
         return "Error: State not found"
     
 
-def generateGreetingsResponse(intend,question_dict,has_image,profile,question):
+def generateGreetingsResponse(intend,question_dict,has_image,profile):
     if intend=="user_neutral_goodbye":
         return "exit","Goodbye, sorry to see you leave this early, I hope I was helpful.",None,None
     elif intend=="user_neutral_greeting":
@@ -23,7 +23,7 @@ def generateGreetingsResponse(intend,question_dict,has_image,profile,question):
     elif "user_neutral" in intend:
         return "greetings","Sorry, I wasn't prepared to answer those kind of question, can you rephrase it ?",None,None
     elif intend=="user_request_get_products":
-        products = getProductOpenSearch(question_dict,has_image,question,profile)
+        products = getProductOpenSearch(question_dict,has_image,profile)
         text = generateTextFromProducts(products)
         return "retrieval", text, recommandationsFromProducts(products),products
     elif "user_qa" in intend or "user_inform" in intend:
@@ -33,13 +33,13 @@ def generateGreetingsResponse(intend,question_dict,has_image,profile,question):
         return "Error: Intend not found in generateGreetingsResponse"
         
 
-def generateRetrievalResponse(intend,previous_products,question_dict,has_image,profile,question):
+def generateRetrievalResponse(intend,previous_products,question_dict,has_image,profile):
     if intend=="user_neutral_goodbye":
         return "exit","Goodbye, I hope I was helpful.",None,previous_products
     elif "user_neutral" in intend:
         return "retrieval","Sorry, I wasn't prepared to answer those kind of question, can you rephrase it ?",None,previous_products
     elif intend=="user_request_get_products":
-        products = getProductOpenSearch(question_dict,has_image,question,profile)
+        products = getProductOpenSearch(question_dict,has_image,profile)
         text = generateTextFromProducts(products)
         return "retrieval", text, recommandationsFromProducts(products),products
     elif "user_qa" in intend or "user_inform" in intend:
@@ -48,13 +48,13 @@ def generateRetrievalResponse(intend,previous_products,question_dict,has_image,p
         print("Error: Intend not found in generateRetrievalResponse")
         return "Error: Intend not found in generateRetrievalResponse"
 
-def generateInformationResponse(intend,previous_products,question_dict,has_image,profile,question):
+def generateInformationResponse(intend,previous_products,question_dict,has_image,profile):
     if intend=="user_neutral_goodbye":
         return "exit","Goodbye, I hope I was helpful.",None,previous_products
     elif "user_neutral" in intend:
         return "information","Sorry, I wasn't prepared to answer those kind of question, can you rephrase it ?",None,previous_products
     elif intend=="user_request_get_products":
-        products = getProductOpenSearch(question_dict,has_image,question,profile)
+        products = getProductOpenSearch(question_dict,has_image,profile)
         text = generateTextFromProducts(products)
         return "retrieval", text, recommandationsFromProducts(products),products
     elif "user_qa" in intend or "user_inform" in intend:
