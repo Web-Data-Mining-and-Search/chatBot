@@ -22,7 +22,7 @@ def generateGreetingsResponse(intend,question_dict,has_image,profile,question):
         return "greetings","Hi, I am a chatbot. Ask me anything about fashion!",None
     elif "user_neutral" in intend:
         return "greetings","Sorry, I wasn't prepared to answer those kind of question, can you rephrase it ?",None
-    elif "user_request_get_product" in intend:
+    elif intend=="user_request_get_products":
         temp = get_response(question_dict,has_image,question,profile)
         return "retrieval", temp[0],temp[1]
     elif "user_qa" in intend or "user_inform" in intend:
@@ -37,9 +37,9 @@ def generateRetrievalResponse(intend,previous_products,question_dict,has_image,p
         return "exit","Goodbye, I hope I was helpful.",None
     elif "user_neutral" in intend:
         return "retrieval","Sorry, I wasn't prepared to answer those kind of question, can you rephrase it ?",None
-    elif intend=="user_request_get_product":
+    elif intend=="user_request_get_products":
         temp = get_response(question_dict,has_image,question,profile)
-        return "retrieval", temp[0],temp[1]
+        return "retrieval", temp[0], temp[1]
     elif "user_qa" in intend or "user_inform" in intend:
         return "information", informative.getInformativeText(previous_products,intend),None
     else:
@@ -51,7 +51,7 @@ def generateInformationResponse(intend,previous_products,question_dict,has_image
         return "exit","Goodbye, I hope I was helpful.",None
     elif "user_neutral" in intend:
         return "information","Sorry, I wasn't prepared to answer those kind of question, can you rephrase it ?",None
-    elif intend=="user_request_get_product":
+    elif intend=="user_request_get_products":
         temp = get_response(question_dict,has_image,question,profile)
         return "retrieval", temp[0],temp[1]
     elif "user_qa" in intend or "user_inform" in intend:
