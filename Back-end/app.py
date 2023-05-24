@@ -66,7 +66,7 @@ def get_response(question_dict, has_image,question=None,profile=None):
    '''
 
    if not question_dict and not has_image:
-      return generate_response("I don't understand your question. Please ask me something else.")
+      return "I don't understand your question. Please ask me something else."
    print("query:")
    print(get_query(question_dict, has_image,question,profile))
    response = client.search(body = get_query(question_dict, has_image,question,profile),index = index_name)
@@ -114,18 +114,21 @@ def hello():
    profile={'brand':[],'image':[], 'id':[], 'main_color':[], 'second_color':[], 'material':[]}
 
    if pre_profile:
-         for element in pre_profile['products']:
-            profile['brand'].append(element['brand'])
-            profile['image'].append(element['image_path'])
-            profile['id'].append(element['id'])
-            profile['main_color'].append(element['main_color'])
-            profile['second_color'].append(element['second_color'])
-            profile['material'].append(element['material'])
-   tmp=[]
-   for list in profile['material']:
-      for element in list:
-         tmp.append(element)
-   profile['material']=tmp
+      for element in pre_profile['products']:
+         profile['brand'].append(element['brand'])
+         profile['image'].append(element['image_path'])
+         profile['id'].append(element['id'])
+         profile['main_color'].append(element['main_color'])
+         profile['second_color'].append(element['second_color'])
+         profile['material'].append(element['material'])
+      tmp=[]
+      for list in profile['material']:
+         for element in list:
+            tmp.append(element)
+      profile['material']=tmp
+
+   if profile == {'brand':[],'image':[], 'id':[], 'main_color':[], 'second_color':[], 'material':[]}:
+      profile=None
    print(profile)
 
 
@@ -134,12 +137,14 @@ def hello():
       has_image = True
    intend,question_dict = parse_question(question)
    
-   stateDialogManager,text,recommandations=dialogManager.generateResponseAndState(stateDialogManager,previous_products,intend,question_dict,has_image,question,profile)
+   stateDialogManager,text,recommandations=dialogManager.generateResponseAndState(stateDialogManager,previous_products,intend,question_dict,has_image,profile,question)
    if recommandations:
       previous_products=recommandations
    #get the response from the model
    response = generate_response(text,recommandations)
    print(response)
+   print(stateDialogManager)
+   print(previous_products)
    return json.jsonify(response)
 
    
