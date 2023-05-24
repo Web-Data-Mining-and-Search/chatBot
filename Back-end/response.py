@@ -25,7 +25,7 @@ def add_recommendations(result):
         'main_color' : result['_source']['product_main_colour'],
         'second_color' : result['_source']['product_second_color'],
         'material' : result['_source']['product_materials'],
-        'message' : description_product(result)
+        # 'message' : description_product(result)
     }
 
 # Generate the response
@@ -37,19 +37,12 @@ def responseToText(results):
 
     if len(results) > 0:
 
-        textReponse = "I found the following products: "
         for result in results:
             recommandation.append(add_recommendations(result))
 
-    else:
-        textReponse = "I'm sorry, I didn't find any product matching your request. Please try again."
+    text = "Here are the recommendations for you:"
 
-    return { 
-        'has_response' : 'true',
-        'recommendations' : recommandation,
-        'response' : textReponse,
-        'system_action' : 'inform',
-        }
+    return text, recommandation
 
 def responseToProfil(results):
     random.shuffle(results)  # Mélangez les résultats de manière aléatoire
