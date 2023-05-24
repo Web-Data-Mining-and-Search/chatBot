@@ -1,42 +1,14 @@
 import datetime
 from flask import Flask, request, json
 
+# local imports
 
-from opensearchpy import OpenSearch
 from images import write_out
 from response import *
-from parsequestion import parse_question
+from parsequestion import getIntendAndInformation
 from query import *
 import dialogManager
 
-
-
-# Start the OpenSearch client
-
-host = 'api.novasearch.org'
-port = 443
-
-index_name = "farfetch_images"
-
-# read the login credentials from a file
-
-with open('mdp.txt', 'r') as f:
-   user = f.readline().strip()
-   password = f.readline().strip()
-
-
-# Create the OpenSearch client
-
-client = OpenSearch(
-   hosts = [{'host': host, 'port': port}],
-   http_compress = True,
-   http_auth = (user, password),
-   url_prefix = 'opensearch',
-   use_ssl = True,
-   verify_certs = False,
-   ssl_assert_hostname = False,
-   ssl_show_warn = False
-)
 
 # Create the flask server
 
@@ -45,34 +17,12 @@ app = Flask(__name__)
 app.permanent_session_lifetime = datetime.timedelta(days=365)
 cors=CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
+
+# Initialize global variables
+
 global stateDialogManager, previous_products
 stateDialogManager = "greetings"
 previous_products = []
-
-# make a request to the OpenSearch client
-
-def get_response(question_dict, has_image,question=None,profile=None):
-   '''
-   Returns a text response based on the given question dictionary and question image.
-   
-   @param question_dict: A dictionary containing information about the user's question.
-   @type question_dict: dict
-   
-   @param has_image: A boolean indicating whether the question includes an image.
-   @type has_image: bool
-   
-   @return: A text response generated based on the user's question.
-   @rtype: str
-   '''
-
-   if not question_dict and not has_image:
-      return "I don't understand your question. Please ask me something else."
-   print("query:")
-   print(get_query(question_dict, has_image,question,profile))
-   response = client.search(body = get_query(question_dict, has_image,question,profile),index = index_name)
-   print(response)
-
-   return responseToText(response['hits']['hits'])
 
 
 # Handle the request
@@ -94,26 +44,8 @@ def hello():
    base64Image = jsonData.get('file')
    pre_profile = jsonData.get('profile')
 
-   '''{
-         {
-            'brand' :'Gucci',
-            'id' : 1234,
-            'image_path' : 'http..',
-            'main_color' : 'Green',
-            'second_color' : 'Red',
-            'material' : 'Coton',
-         },{
-            'brand' :'Gucci',
-            'id' : 1234,
-            'image_path' : 'http..',
-            'main_color' : 'Green',
-            'second_color' : 'Red',
-            'material' : 'Coton',
-         }
-      }'''
-   profile={'brand':[],'image':[], 'id':[], 'main_color':[], 'second_color':[], 'material':[]}
-
-   if pre_profile:
+   if pre_profile["products"] != []:
+      profile={'brand':[],'image':[], 'id':[], 'main_color':[], 'second_color':[], 'material':[]}
       for element in pre_profile['products']:
          profile['brand'].append(element['brand'])
          profile['image'].append(element['image_path'])
@@ -124,33 +56,38 @@ def hello():
       tmp=[]
       for list in profile['material']:
          for element in list:
-            tmp.append(element)
+            tmp.append(element)  
       profile['material']=tmp
-
-   if profile == {'brand':[],'image':[], 'id':[], 'main_color':[], 'second_color':[], 'material':[]}:
+   
+   else:
       profile=None
-   print(profile)
+   print("Profile :"+str(profile))
 
 
    if base64Image:
       write_out(base64Image)
       has_image = True
-   intend,question_dict = parse_question(question)
+
+   intend,question_dict = getIntendAndInformation(question)
+
+   print("Intend :"+str(intend))
+   print("Question dict :"+str(question_dict))
+
+   print("Global variables : State:"+str(stateDialogManager))
+   print("Previous products :"+str(previous_products))
+
    
-   stateDialogManager,text,recommandations=dialogManager.generateResponseAndState(stateDialogManager,previous_products,intend,question_dict,has_image,profile,question)
-   if recommandations:
-      previous_products=recommandations
+   stateDialogManager,text,recommendations,previous_products=dialogManager.generateResponseAndState(stateDialogManager,previous_products,intend,question_dict,has_image,profile,question)
+
    #get the response from the model
-   response = generate_response(text,recommandations)
-   print(response)
-   print(stateDialogManager)
-   print(previous_products)
+   response = generate_response(text,recommendations)
+   print("Response dict:"+str(response))
+   
    return json.jsonify(response)
 
    
 
       
-
 @app.route('/profile',methods = ['POST','OPTIONS'])
 @cross_origin()
 def profile():
@@ -160,7 +97,6 @@ def profile():
    kidsProfile = jsonData.get('kids')
    beautyProfile = jsonData.get('beauty')
    stateOfProfile = jsonData.get('state')
-   print(stateOfProfile, womenProfile, menProfile, kidsProfile, beautyProfile)
    if stateOfProfile == 'tops':
       responseTops = client.search(body = profile_query(womenProfile, menProfile, kidsProfile, beautyProfile, "T-Shirts & Vests"),index = index_name)
       textresponseTops = responseToProfil(responseTops['hits']['hits'])

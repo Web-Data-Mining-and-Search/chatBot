@@ -1,5 +1,5 @@
 import numpy as np
-from parsequestion import generate_query, unchange_request
+from parsequestion import unchange_request
 from PIL import Image
 import requests
 
@@ -58,18 +58,17 @@ def get_text(question_dict,profile=None):
     """
 
     for key,value in question_dict.items():
-        print(key + value)
         key = "product_{}".format(unchange_request(key))
         
 
         query['should'].append(
             {
             "multi_match": {
-               "query": value,
-               "fields": key,
-               "boost": 2
+                "query": value,
+                "fields": key,
+                "boost": 2
+                }
             }
-      }
         )
 
     #take in count profile
@@ -79,10 +78,10 @@ def get_text(question_dict,profile=None):
             query['should'].append(
                 {
                 "multi_match": {
-                "query": color,
-                "fields": field,
-                "boost": 0.5
-                }
+                    "query": color,
+                    "fields": field,
+                    "boost": 0.5
+                    }
                 }
             )
 
@@ -91,10 +90,10 @@ def get_text(question_dict,profile=None):
             query['should'].append(
                 {
                 "multi_match": {
-                "query": brand,
-                "fields": field,
-                "boost": 0.5
-                }
+                    "query": brand,
+                    "fields": field,
+                    "boost": 0.5
+                    }
                 }
             )
         
@@ -103,10 +102,10 @@ def get_text(question_dict,profile=None):
             query['should'].append(
                 {
                 "multi_match": {
-                "query": brand,
-                "fields": field,
-                "boost": 0.5
-                }
+                    "query": brand,
+                    "fields": field,
+                    "boost": 0.5
+                    }
                 }
             )
 
@@ -264,42 +263,42 @@ def get_images_text(question,profile=None):
         }
 
 def profile_query(womenProfile, menProfile, kidsProfile, beautyProfile, categ):
-   query = {'should': [], 'must': []}
+    query = {'should': [], 'must': []}
 
-   profiles = [womenProfile, menProfile, kidsProfile, beautyProfile]
-   genders = ['WOMEN', 'MEN', 'KIDS', 'BEAUTY']
+    profiles = [womenProfile, menProfile, kidsProfile, beautyProfile]
+    genders = ['WOMEN', 'MEN', 'KIDS', 'BEAUTY']
 
-   for profile, gender in zip(profiles, genders):
-      if profile:
-         query['should'].append({
-               "multi_match": {
-                  "query": gender,
-                  "fields": 'product_gender',
-               }
-         })
+    for profile, gender in zip(profiles, genders):
+        if profile:
+            query['should'].append({
+                "multi_match": {
+                    "query": gender,
+                    "fields": 'product_gender',
+                }
+            })
 
-   if categ == 'Shoes':
-      query['must'].append({
-            "multi_match": {
-               "query": 'Shoes',
-               "fields": 'product_family',
-            }
-      })
-   elif categ == 'Pants':
-    query['must'].append({
+    if categ == 'Shoes':
+        query['must'].append({
+                "multi_match": {
+                "query": 'Shoes',
+                "fields": 'product_family',
+                }
+        })
+    elif categ == 'Pants':
+        query['must'].append({
         "multi_match": {
             "query": 'Trousers',
             "fields": 'product_category',
         }
-   })
-   else:
-      query['must'].append({
+    })
+    else:
+        query['must'].append({
             "multi_match": {
-               "query": categ,
-               "fields": 'product_category',
+                "query": categ,
+                "fields": 'product_category',
             }
-      })
-   return {
+        })
+    return {
         'size': 1000,
         '_source': ['product_id', 'product_family', 'product_category', 'product_sub_category', 'product_gender', 
                     'product_main_colour', 'product_second_color', 'product_brand', 'product_materials', 
