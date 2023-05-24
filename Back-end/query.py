@@ -8,7 +8,7 @@ from transformers import CLIPProcessor, CLIPModel, CLIPTokenizer, CLIPImageProce
 import torch
 # Create the query
 
-def get_query(question_dict, has_image,question=None,profile=None):
+def get_query(question_dict, has_image,profile=None):
     '''
     Generates a search query based on the given question text dictionary and whether the question includes an image.
     
@@ -35,7 +35,7 @@ def get_query(question_dict, has_image,question=None,profile=None):
         query['query']=get_similar_images(profile)
 
     elif has_image and question_dict:
-        query['query']=get_images_text(question,profile)
+        query['query']=get_images_text(question_dict,profile)
 
     return query
 
@@ -102,7 +102,7 @@ def get_text(question_dict,profile=None):
             query['should'].append(
                 {
                 "multi_match": {
-                    "query": brand,
+                    "query": material,
                     "fields": field,
                     "boost": 0.5
                     }
@@ -186,7 +186,7 @@ def get_similar_images(profile=None):
             }
         }
 
-def get_images_text(question,profile=None):
+def get_images_text(question_dict,profile=None):
 
     '''
     This function retrieves the embeddings for an input image  and input text using the CLIP model, and returns a query that can be
@@ -204,9 +204,14 @@ def get_images_text(question,profile=None):
     input_img= processor(images=qimg, return_tensors="pt")
     embeddings_img = F.normalize(model.get_image_features(**input_img))
 
-    inputs = tokenizer([question], padding=True, return_tensors="pt")
-    text_features = F.normalize(model.get_text_features(**inputs))
-    text_embeds = text_features[0].detach().numpy().tolist()
+    text_embeds=0
+
+    for key,value in question_dict.items():
+        inputs = tokenizer([value], padding=True, return_tensors="pt")
+        text_features = F.normalize(model.get_text_features(**inputs))
+        text_embeds +=text_features[0].detach().numpy()
+
+    embeddings_txt = text_embeds.tolist()
 
     if profile !=None:
         embedding_profile_image=0
@@ -238,7 +243,7 @@ def get_images_text(question,profile=None):
         profile_main_color_embeds = embedding_profile_color.tolist()
         profile_material_embeds = embedding_profile_material.tolist()
         profile_brand_embeds = embedding_profile_brand.tolist()
-        embeds = torch.tensor(embeddings_img[0].detach().numpy()+np.array(text_embeds)+ 0.4*embedding_profile_image+profile_brand_embeds+profile_material_embeds+profile_main_color_embeds)
+        embeds = torch.tensor(embeddings_img[0].detach().numpy()+embeddings_txt+ 0.4*embedding_profile_image+profile_brand_embeds+profile_material_embeds+profile_main_color_embeds)
         comb_embeds = F.normalize(embeds, dim=0).to(torch.device('cpu')).numpy()
 
         return{
