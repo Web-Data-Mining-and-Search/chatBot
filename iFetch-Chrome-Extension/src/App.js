@@ -15,10 +15,7 @@ function Recomenadation(props) {
     const [index, setIndex] = useState(0);
     const message = recommendations[index].message;
 
-    var temp = {
-        brand: recommendations[index].brand,
-        image_path: recommendations[index].image_path,
-    }
+    console.log(recommendations);
 
     const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
@@ -44,19 +41,17 @@ function Recomenadation(props) {
                 second_color: Recomenadation.second_color,
                 material: Recomenadation.material,
             }
+            console.log(temp);
             profile.products.push(temp);
         } else {
             button.className = "heart-button";
-            const temp = {
-                brand: Recomenadation.brand,
-                image_path: Recomenadation.image_path,
-            }
 
             profile.products = profile.products.filter((product) => {
                 return product.id !== Recomenadation.id;
             }
             );
         }
+        console.log(profile);
     };
 
     var click = (dir) => {
@@ -643,9 +638,7 @@ function App() {
 
 
     function setProfilePage(){
-        if (!showContent) return;
         setChatbox();
-        // wait for the change to apply
         setTimeout(() => {
             const container = document.getElementById("content-container");
             container.innerHTML = "";
@@ -699,7 +692,7 @@ function App() {
                 profileContainer.appendChild(card);
             }
             container.appendChild(profileContainer);
-        }, 200);
+        }, 1);
 
     }
 
