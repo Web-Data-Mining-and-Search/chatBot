@@ -130,8 +130,10 @@ def hello():
       has_image = True
    parsed_question = parse_question(question)
 
+   dico={'category' : 't-shirt','colour':'red','brand':'prada'}
+   
    #get the response from the model
-   response = get_response(parsed_question, has_image, question,profile)
+   response = get_response(dico, has_image, question,profile)
    return json.jsonify(response)
 
    

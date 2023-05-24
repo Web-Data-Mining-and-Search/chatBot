@@ -1,5 +1,5 @@
 import numpy as np
-from parsequestion import generate_query
+from parsequestion import generate_query, unchange_request
 from PIL import Image
 import requests
 
@@ -8,12 +8,12 @@ from transformers import CLIPProcessor, CLIPModel, CLIPTokenizer, CLIPImageProce
 import torch
 # Create the query
 
-def get_query(questionText_dict, has_image,question=None,profile=None):
+def get_query(question_dict, has_image,question=None,profile=None):
     '''
     Generates a search query based on the given question text dictionary and whether the question includes an image.
     
-    @param questionText_dict: A dictionary containing information about the user's question text.
-    @type questionText_dict: dict
+    @param question_dict: A dictionary containing information about the user's question text.
+    @type question_dict: dict
     
     @param has_image: A boolean indicating whether the question includes an image.
     @type has_image: bool
@@ -28,25 +28,91 @@ def get_query(questionText_dict, has_image,question=None,profile=None):
                     'product_short_description', 'product_attributes', 'product_image_path', 
                     'product_highlights', 'outfits_ids', 'outfits_products']
     }
-    if questionText_dict and not has_image:
-        question_must = questionText_dict['must']
-        question_must_not = questionText_dict['must_not']
-        question_should = questionText_dict['should']
-        question_filter = questionText_dict['filter']
-        query['query']= {
-            'bool':{
-                "must": generate_query(question_must, "must"),
-                "must_not": generate_query(question_must_not, "must_not"),
-                "should": generate_query(question_should, "should"),
-                "filter": generate_query(question_filter, "filter")
-            }
-        }
-    elif has_image and not questionText_dict:
+    if question_dict and not has_image:
+        query['query']=get_text(question_dict)
+
+    elif has_image and not question_dict:
         query['query']=get_similar_images(profile)
-    else:
+
+    elif has_image and question_dict:
         query['query']=get_images_text(question,profile)
 
     return query
+
+
+def get_text(question_dict,profile=None):
+
+    query = {'should': [], 'must': [],'must_not':[], 'filter':[]}
+
+    """
+    question_must = question_dict['must']
+    question_must_not = question_dict['must_not']
+    question_should = question_dict['should']
+    question_filter = question_dict['filter']
+
+    
+            "must": generate_query(question_must, "must"),
+            "must_not": generate_query(question_must_not, "must_not"),
+            "should": generate_query(question_should, "should"),
+            "filter": generate_query(question_filter, "filter")
+    """
+
+    for key,value in question_dict.items():
+        print(key + value)
+        key = "product_{}".format(unchange_request(key))
+        query['should'].append(
+            {
+            "multi_match": {
+               "query": value,
+               "fields": key,
+            }
+      }
+        )
+
+    #take in count profile
+    if profile !=None:
+        for color in profile["main_color"]:
+            field = "product_{}".format("main_colour")
+            query['should'].append(
+                {
+                "multi_match": {
+                "query": color,
+                "fields": field,
+                }
+                }
+            )
+
+        for brand in profile["brand"]:
+            field = "product_{}".format("brand")
+            query['should'].append(
+                {
+                "multi_match": {
+                "query": brand,
+                "fields": field,
+                }
+                }
+            )
+        
+        for material in profile["material"]:
+            field="product_{}".format("materials")
+            query['should'].append(
+                {
+                "multi_match": {
+                "query": brand,
+                "fields": field,
+                }
+                }
+            )
+
+    return{
+        'bool':{
+            "must": query['must'],
+            "must_not": query['must_not'],
+            "should": query['should'],
+            "filter": query['filter']
+            }
+        }
+
 
 def get_similar_images(profile=None):
     '''

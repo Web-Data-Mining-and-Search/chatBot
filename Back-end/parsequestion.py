@@ -113,15 +113,16 @@ def change_request(request):
     return request
 
 def unchange_request(request):
-
-    if request == 'subcategory':
-        return 'sub_category'
-    elif request == 'maincolour':
+    if request == 'category_gender_name':
+        return 'gender'
+    if request == 'gender_name':
+        return 'gender'
+    elif request == 'colour':
         return 'main_colour'
-    elif request == 'secondcolour':
-        return 'second_colour'
-    elif request == 'shortdescription':
-        return 'short_description'
+    elif request == 'material_name':
+        return 'materials'
+    elif request == 'brand_name':
+        return 'brand'
     else:
         return request
 
