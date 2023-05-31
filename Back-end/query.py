@@ -66,7 +66,7 @@ def get_text(question_dict,profile=None):
                "query": value,
                "fields": key,
             }
-      }
+        }
         )
 
     #take in count profile
