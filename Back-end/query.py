@@ -1,5 +1,5 @@
 import numpy as np
-from parsequestion import generate_query, unchange_request
+from parsequestion import unchange_request
 from PIL import Image
 import requests
 
@@ -8,7 +8,7 @@ from transformers import CLIPProcessor, CLIPModel, CLIPTokenizer, CLIPImageProce
 import torch
 # Create the query
 
-def get_query(question_dict, has_image,question=None,profile=None):
+def get_query(question_dict, has_image,profile=None):
     '''
     Generates a search query based on the given question text dictionary and whether the question includes an image.
     
@@ -35,7 +35,7 @@ def get_query(question_dict, has_image,question=None,profile=None):
         query['query']=get_similar_images(profile)
 
     elif has_image and question_dict:
-        query['query']=get_images_text(question,profile)
+        query['query']=get_images_text(question_dict,profile)
 
     return query
 
@@ -58,15 +58,17 @@ def get_text(question_dict,profile=None):
     """
 
     for key,value in question_dict.items():
-        print(key + value)
         key = "product_{}".format(unchange_request(key))
+        
+
         query['should'].append(
             {
             "multi_match": {
-               "query": value,
-               "fields": key,
+                "query": value,
+                "fields": key,
+                "boost": 2
+                }
             }
-        }
         )
 
     #take in count profile
@@ -76,9 +78,10 @@ def get_text(question_dict,profile=None):
             query['should'].append(
                 {
                 "multi_match": {
-                "query": color,
-                "fields": field,
-                }
+                    "query": color,
+                    "fields": field,
+                    "boost": 0.5
+                    }
                 }
             )
 
@@ -87,9 +90,10 @@ def get_text(question_dict,profile=None):
             query['should'].append(
                 {
                 "multi_match": {
-                "query": brand,
-                "fields": field,
-                }
+                    "query": brand,
+                    "fields": field,
+                    "boost": 0.5
+                    }
                 }
             )
         
@@ -98,9 +102,10 @@ def get_text(question_dict,profile=None):
             query['should'].append(
                 {
                 "multi_match": {
-                "query": brand,
-                "fields": field,
-                }
+                    "query": material,
+                    "fields": field,
+                    "boost": 0.5
+                    }
                 }
             )
 
@@ -181,7 +186,7 @@ def get_similar_images(profile=None):
             }
         }
 
-def get_images_text(question,profile=None):
+def get_images_text(question_dict,profile=None):
 
     '''
     This function retrieves the embeddings for an input image  and input text using the CLIP model, and returns a query that can be
@@ -199,9 +204,14 @@ def get_images_text(question,profile=None):
     input_img= processor(images=qimg, return_tensors="pt")
     embeddings_img = F.normalize(model.get_image_features(**input_img))
 
-    inputs = tokenizer([question], padding=True, return_tensors="pt")
-    text_features = F.normalize(model.get_text_features(**inputs))
-    text_embeds = text_features[0].detach().numpy().tolist()
+    text_embeds=0
+
+    for key,value in question_dict.items():
+        inputs = tokenizer([value], padding=True, return_tensors="pt")
+        text_features = F.normalize(model.get_text_features(**inputs))
+        text_embeds +=text_features[0].detach().numpy()
+
+    embeddings_txt = text_embeds.tolist()
 
     if profile !=None:
         embedding_profile_image=0
@@ -233,7 +243,7 @@ def get_images_text(question,profile=None):
         profile_main_color_embeds = embedding_profile_color.tolist()
         profile_material_embeds = embedding_profile_material.tolist()
         profile_brand_embeds = embedding_profile_brand.tolist()
-        embeds = torch.tensor(embeddings_img[0].detach().numpy()+np.array(text_embeds)+ 0.4*embedding_profile_image+profile_brand_embeds+profile_material_embeds+profile_main_color_embeds)
+        embeds = torch.tensor(embeddings_img[0].detach().numpy()+embeddings_txt+ 0.4*embedding_profile_image+profile_brand_embeds+profile_material_embeds+profile_main_color_embeds)
         comb_embeds = F.normalize(embeds, dim=0).to(torch.device('cpu')).numpy()
 
         return{
@@ -258,42 +268,42 @@ def get_images_text(question,profile=None):
         }
 
 def profile_query(womenProfile, menProfile, kidsProfile, beautyProfile, categ):
-   query = {'should': [], 'must': []}
+    query = {'should': [], 'must': []}
 
-   profiles = [womenProfile, menProfile, kidsProfile, beautyProfile]
-   genders = ['WOMEN', 'MEN', 'KIDS', 'BEAUTY']
+    profiles = [womenProfile, menProfile, kidsProfile, beautyProfile]
+    genders = ['WOMEN', 'MEN', 'KIDS', 'BEAUTY']
 
-   for profile, gender in zip(profiles, genders):
-      if profile:
-         query['should'].append({
-               "multi_match": {
-                  "query": gender,
-                  "fields": 'product_gender',
-               }
-         })
+    for profile, gender in zip(profiles, genders):
+        if profile:
+            query['should'].append({
+                "multi_match": {
+                    "query": gender,
+                    "fields": 'product_gender',
+                }
+            })
 
-   if categ == 'Shoes':
-      query['must'].append({
-            "multi_match": {
-               "query": 'Shoes',
-               "fields": 'product_family',
-            }
-      })
-   elif categ == 'Pants':
-    query['must'].append({
+    if categ == 'Shoes':
+        query['must'].append({
+                "multi_match": {
+                "query": 'Shoes',
+                "fields": 'product_family',
+                }
+        })
+    elif categ == 'Pants':
+        query['must'].append({
         "multi_match": {
             "query": 'Trousers',
             "fields": 'product_category',
         }
-   })
-   else:
-      query['must'].append({
+    })
+    else:
+        query['must'].append({
             "multi_match": {
-               "query": categ,
-               "fields": 'product_category',
+                "query": categ,
+                "fields": 'product_category',
             }
-      })
-   return {
+        })
+    return {
         'size': 1000,
         '_source': ['product_id', 'product_family', 'product_category', 'product_sub_category', 'product_gender', 
                     'product_main_colour', 'product_second_color', 'product_brand', 'product_materials', 
