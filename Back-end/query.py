@@ -1,5 +1,5 @@
 import numpy as np
-from parsequestion import unchange_request
+from parsequestion import unchange_request, unchange_value
 from PIL import Image
 import requests
 
@@ -59,7 +59,7 @@ def get_text(question_dict,profile=None):
 
     for key,value in question_dict.items():
         key = "product_{}".format(unchange_request(key))
-        
+        value= unchange_value(value)
 
         query['should'].append(
             {

@@ -16,10 +16,6 @@ tokenizer = AutoTokenizer.from_pretrained(checkpoint_name, truncation_side='left
 model, input_function, dataloading_function = get_model(checkpoint_name, tokenizer, None)
 
 
-tee_shirt= ['tee-shirt','tee-shirts','t-shirt','t-shirts','tee shirt','tee shirts','t shirt','t shirts']
-jean =['jean','jeans','pant','pants','denims']
-
-
 def add_special_tokens_to_model_and_tokenizer(model, tokenizer, special_tokens, embeddings):
     # TODO instead of checking for the shared param you should really just have a good way to tell whether the model has some sort of decoder
     if model is None or hasattr(model, 'shared'):
@@ -74,3 +70,23 @@ def unchange_request(request):
         return 'brand'
     else:
         return request
+
+def unchange_value(value):
+
+    tee_shirt= ['tee-shirt','tee-shirts','t-shirt','t-shirts','tee shirt','tee shirts','t shirt','t shirts','top','Top','tops']
+    denim =['jean','jeans','pant','pants','denims']
+    jacket=['blazer','jacket','coat']
+    trouser =['Trouser', 'trouser','trousers']
+    polo =['polos','polo', 'polo tee shirt','polo shirt', 'polo tee-shirt', 'polo tee shirts','polo tee-shirts']
+    if tee_shirt.__contains__(value):
+        return 'Tops'
+    elif denim.__contains__(value):
+        return 'Denim'
+    elif jacket.__contains__(value):
+        return 'Jackets'
+    elif trouser.__contains__(value):
+        return 'Trousers'
+    elif polo.__contains__(value):
+        return 'Polo Shirts'                                                                                                                                                                                        
+    else :
+        return value
