@@ -534,24 +534,14 @@ function App() {
     const logo = "farfetch-logo.png";
 
     const initialMessage = () => {
-        const message = {
-            message: "Hello from React",
-            uID: userID,
-            sID: sessionID,
+
+        const initialMessage = {
+            provider_id: "iFetch",
+            utterance: "Hi! I am a chatbot. Ask me anything about fashion!",
+            recommendations:[],
         };
 
-        const queryInfo = {
-            active: true,
-            currentWindow: true,
-        };
-
-        chrome.tabs &&
-            chrome.tabs.query(queryInfo, (tabs) => {
-                const currentTabId = tabs[0].id;
-                chrome.tabs.sendMessage(currentTabId, message, (response) => {
-                    console.log(response);
-                });
-            });
+        setMessages((messages) => [...messages, initialMessage]);
     };
 
     const handleSubmit = (message) => {
@@ -564,6 +554,15 @@ function App() {
         };
 
         setMessages((messages) => [...messages, temp]);
+
+        const waitingMessage = {
+            provider_id: "iFetch",
+            utterance: "Please wait while I fetch your recommendations",
+            recommendations: [],
+        };
+
+        setMessages((messages) => [...messages, waitingMessage]);
+
         SendMessage(
             message,
             userID,
@@ -591,7 +590,11 @@ function App() {
         };
 
         if (isUpToDate) {
-            setMessages((messages) => [...messages, temp1]);
+            // replace the last message
+            setMessages((messages) => {
+                messages[messages.length - 1] = temp1;
+                return [...messages];
+            });
             return;
         }
 
@@ -600,21 +603,12 @@ function App() {
             utterance: utterance,
             recommendations: [],
         };
-        setMessages((messages) => [...messages, temp1, temp2]);
+        setMessages((messages) => {
+            return [...messages, temp1, temp2]; 
+        });
     };
 
     useEffect(() => {
-        const response = SendMessage(
-            "Hi!",
-            userID,
-            sessionID,
-            "",
-            "",
-            recieveMessage,
-            null,
-            true,
-            profile,
-        );
         initialMessage();
     }, []);
 

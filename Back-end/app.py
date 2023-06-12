@@ -7,7 +7,7 @@ from images import write_out
 from response import *
 from parsequestion import getIntendAndInformation
 from query import *
-import dialogManager
+from dialogManager import generateResponseAndState
 
 
 # Create the flask server
@@ -34,10 +34,6 @@ def hello():
    has_image = False
    jsonData = json.loads(request.data)
 
-   #make the first message to the user
-   if jsonData.get('utterance') == "Hi!":
-      return json.jsonify({'response':'Hi! I am a chatbot. Ask me anything about fashion!'})
-   
    #take the message from the user 
    
    question = jsonData.get('utterance')
@@ -77,7 +73,7 @@ def hello():
    print("Previous products :"+str(previous_products))
 
    
-   stateDialogManager,text,recommendations,previous_products=dialogManager.generateResponseAndState(stateDialogManager,previous_products,intend,question_dict,has_image,profile)
+   stateDialogManager,text,recommendations,previous_products=generateResponseAndState(stateDialogManager,previous_products,intend,question_dict,has_image,profile)
 
    #get the response from the model
    response = generate_response(text,recommendations)
