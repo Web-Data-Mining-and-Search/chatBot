@@ -34,7 +34,7 @@ client = OpenSearch(
 
 # make a request to the OpenSearch client
 
-def getProductOpenSearch(question_dict, has_image,profile=None):
+def getProductOpenSearch(question_dict, has_image,profile=None, ban_id = []):
     '''
     Returns a text response based on the given question dictionary and question image.
     
@@ -48,7 +48,9 @@ def getProductOpenSearch(question_dict, has_image,profile=None):
     @rtype: str
     '''
 
-    response = client.search(body = get_query(question_dict, has_image,profile),index = index_name)
+    response = client.search(body = get_query(question_dict, has_image,profile,ban_id),index = index_name)
+    
+
 
     return response['hits']['hits']
 
@@ -123,6 +125,7 @@ def generate_response(text, products):
 
 def getProductsfromPrevious(previous_products):
     previous ={}
+    ban_id = []
     previous['category']= ''
     previous['colour']=''
     for key, values in previous_products[2].items():
@@ -132,4 +135,7 @@ def getProductsfromPrevious(previous_products):
                     previous['category']= previous['category']+value
                 elif category =='product_main_colour':
                     previous['colour']= previous['colour']+ value
-    return previous
+    
+    for product in previous_products:
+        ban_id.append(product['_source']['product_id'])
+    return previous, ban_id

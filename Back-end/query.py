@@ -8,7 +8,7 @@ from transformers import CLIPProcessor, CLIPModel, CLIPTokenizer, CLIPImageProce
 import torch
 # Create the query
 
-def get_query(question_dict, has_image,profile=None):
+def get_query(question_dict, has_image,profile=None, ban_id = []):
     '''
     Generates a search query based on the given question text dictionary and whether the question includes an image.
     
@@ -39,6 +39,14 @@ def get_query(question_dict, has_image,profile=None):
 
     elif profile and not has_image and len(question_dict)==0:
         query['query']=get_text(question_dict,profile)
+
+    if ban_id != []:
+        for id in ban_id:
+            query['query']['bool']['must_not'].append({
+                "match": {
+                    "product_id": id
+                }
+            })
 
     return query
 

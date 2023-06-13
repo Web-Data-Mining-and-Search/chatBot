@@ -32,7 +32,7 @@ def generateGreetingsResponse(intend,question_dict,has_image,profile):
         elif len(question_dict)==0 and profile is not None:
             return "criteriaredefinition","Please respecify your criteria of research, if you don't want (say the same phrase) I can show you products based on your profile.",None,None
         else:
-            products = getProductOpenSearch(question_dict,has_image,profile)
+            products = getProductOpenSearch(question_dict,has_image,profile,[])
             text = generateTextFromProducts(products)
             return "retrieval", text, recommandationsFromProducts(products),products
     elif "user_qa" in intend or "user_inform" in intend:
@@ -50,14 +50,13 @@ def generateCriteriaRedefinitionResponse(intend,question_dict,has_image,profile)
         return "support","Sorry, I wasn't prepared to answer those kind of question, can you rephrase it ?",None,None
     elif intend=="user_request_get_products":
         if len(question_dict)==0 and profile is not None:
-            products = getProductOpenSearch(question_dict,has_image,profile)
+            products = getProductOpenSearch(question_dict,has_image,profile,[])
             text = generateTextFromProducts(products)
-            print(products)
             return "retrieval", text, recommandationsFromProducts(products),products
         elif len(question_dict)==0 and profile is None:
             return "criteriaredefinition","Please respecify your criteria of research or like some items, like the color, the brand, the material, the type of product, etc.",None,None
         else:
-            products = getProductOpenSearch(question_dict,has_image,profile)
+            products = getProductOpenSearch(question_dict,has_image,profile,[])
             text = generateTextFromProducts(products)
             return "retrieval", text, recommandationsFromProducts(products),products
     elif "user_qa" in intend or "user_inform" in intend:
@@ -74,12 +73,12 @@ def generateRetrievalResponse(intend,previous_products,question_dict,has_image,p
         return "retrieval","Sorry, I wasn't prepared to answer those kind of question, can you rephrase it ?",None,previous_products
     elif intend=="user_request_get_products":
         if len(question_dict)==0 and previous_products != None:
-            previous = getProductsfromPrevious(previous_products)
-            products_previous = getProductOpenSearch(previous,has_image,profile)
+            previous, ban_id = getProductsfromPrevious(previous_products)
+            products_previous = getProductOpenSearch(previous,has_image,profile,ban_id)
             text = "Here some recommendations based on the previous products : "
-            return "retrieval", text, recommandationsFromProducts(products_previous),products_previous
+            return "retrieval", text, recommandationsFromProducts(products_previous),(products_previous+previous_products)
         elif len(question_dict)!=0:
-            products = getProductOpenSearch(question_dict,has_image,profile)
+            products = getProductOpenSearch(question_dict,has_image,profile,[])
             text = generateTextFromProducts(products)
             return "retrieval", text, recommandationsFromProducts(products),products
         else:
@@ -97,12 +96,13 @@ def generateInformationResponse(intend,previous_products,question_dict,has_image
     elif "user_neutral" in intend:
         return "information","Sorry, I wasn't prepared to answer those kind of question, can you rephrase it ?",None,previous_products
     elif intend=="user_request_get_products":
-        if len(question_dict)==0 and profile is None:
-            return "criteriaredefinition","Please respecify your criteria of research or like some article, like the color, the brand, the material, the type of product, etc.",None,None
-        elif len(question_dict)==0 and profile is not None:
-            return "criteriaredefinition","Please respecify your criteria of research, if you don't want (say the same phrase) I can show you products based on your profile.",None,None
+        if len(question_dict)==0:
+            previous, ban_id  = getProductsfromPrevious(previous_products)
+            products_previous = getProductOpenSearch(previous,has_image,profile,ban_id)
+            text = "Here some recommendations based on the previous products : "
+            return "retrieval", text, recommandationsFromProducts(products_previous),(products_previous+previous_products)
         else:
-            products = getProductOpenSearch(question_dict,has_image,profile)
+            products = getProductOpenSearch(question_dict,has_image,profile,[])
             text = generateTextFromProducts(products)
             return "retrieval", text, recommandationsFromProducts(products),products
     elif "user_qa" in intend or "user_inform" in intend:
@@ -124,7 +124,7 @@ def generateSupportResponse(intend,previous_products,question_dict,has_image,pro
         elif len(question_dict)==0 and profile is not None:
             return "criteriaredefinition","Please respecify your criteria of research, if you don't want (say the same phrase) I can show you products based on your profile.",None,None
         else:
-            products = getProductOpenSearch(question_dict,has_image,profile)
+            products = getProductOpenSearch(question_dict,has_image,profile,[])
             text = generateTextFromProducts(products)
             return "retrieval", text, recommandationsFromProducts(products),products
     elif "user_qa" in intend or "user_inform" in intend:
@@ -136,5 +136,5 @@ def generateSupportResponse(intend,previous_products,question_dict,has_image,pro
 def generateExitResponse(intend):
     if intend=="user_neutral_greeting":
         return "support","Ask me something about fashion!, I will answer you to the best of my ability. for example: 'I want a red dresses' or 'I am looking for black shoes'",None,None
-    return "exit","I can't respond anymore, you have exit the chatbot.",None,None
+    return "exit","I can't respond anymore, you have exit the chatbot. Greet me again if you want to restart", None, None
 
