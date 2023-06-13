@@ -414,6 +414,7 @@ function App() {
         const kidsButton = document.createElement("button");
         kidsButton.className = "button-category";
         kidsButton.innerHTML = "Kids";
+        kidsButton.style.visibility = "hidden";
         kidsButton.onclick = () => {
             selectItem(kidsButton);
         }
@@ -435,6 +436,7 @@ function App() {
         const beautyButton = document.createElement("button");
         beautyButton.className = "button-category";
         beautyButton.innerHTML = "Beauty";
+        beautyButton.style.visibility = "hidden";
         beautyButton.onclick = () => {
             selectItem(beautyButton);
         }
