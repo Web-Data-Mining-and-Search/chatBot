@@ -55,13 +55,9 @@ def getProductOpenSearch(question_dict, has_image,profile=None):
 
 def description_product(result):
     brand= result['_source']['product_brand']
-    category = result['_source']['product_category']
-    color = result['_source']['product_main_colour']
-    gender = result['_source']['product_gender']
+    short_description = result['_source']["product_short_description"]
+    return "This is a " + short_description + " from " + brand + "."
 
-    sentence = "This is a " + color.lower() +" " + category.lower()+ " for " + gender.lower() + " from the brand " +brand.lower()
-
-    return sentence
 
 
 # Add the recommendations to the response
@@ -76,13 +72,13 @@ def add_recommendations(result):
         'main_color' : result['_source']['product_main_colour'],
         'second_color' : result['_source']['product_second_color'],
         'material' : result['_source']['product_materials'],
-        # 'message' : description_product(result)
+        'message' : description_product(result)
     }
 
 # Generate the response
 
 def generateTextFromProducts(products):
-    return "I found {} products that match your request.".format(len(products))
+    return "Here is {} products that match your request.".format(len(products))
 
 
 def recommandationsFromProducts(results):
