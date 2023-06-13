@@ -48,9 +48,6 @@ def getProductOpenSearch(question_dict, has_image,profile=None):
     @rtype: str
     '''
 
-    if not question_dict and not has_image:
-        return "I don't understand your question. Please ask me something else."
-    
     response = client.search(body = get_query(question_dict, has_image,profile),index = index_name)
 
     return response['hits']['hits']

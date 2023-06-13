@@ -29,13 +29,16 @@ def get_query(question_dict, has_image,profile=None):
                     'product_highlights', 'outfits_ids', 'outfits_products']
     }
     if question_dict and not has_image:
-        query['query']=get_text(question_dict)
+        query['query']=get_text(question_dict,profile)
 
     elif has_image and not question_dict:
         query['query']=get_similar_images(profile)
 
     elif has_image and question_dict:
         query['query']=get_images_text(question_dict,profile)
+
+    elif profile and not has_image and len(question_dict)==0:
+        query['query']=get_text(question_dict,profile)
 
     return query
 
@@ -56,20 +59,20 @@ def get_text(question_dict,profile=None):
             "should": generate_query(question_should, "should"),
             "filter": generate_query(question_filter, "filter")
     """
+    if len(question_dict)!=0:
+        for key,value in question_dict.items():
+            key = "product_{}".format(unchange_request(key))
+            value= unchange_value(value)
 
-    for key,value in question_dict.items():
-        key = "product_{}".format(unchange_request(key))
-        value= unchange_value(value)
-
-        query['should'].append(
-            {
-            "multi_match": {
-                "query": value,
-                "fields": key,
-                "boost": 2
+            query['should'].append(
+                {
+                "multi_match": {
+                    "query": value,
+                    "fields": key,
+                    "boost": 2
+                    }
                 }
-            }
-        )
+            )
 
     #take in count profile
     if profile !=None:
