@@ -30,7 +30,7 @@ def generateGreetingsResponse(intend,question_dict,has_image,profile):
         if len(question_dict)==0 and profile is None:
             return "criteriaredefinition","Please respecify your criteria of research, like the color, the brand, the material, the type of product, etc.",None,None
         elif len(question_dict)==0 and profile is not None:
-            return "criteriaredefinition","Please respecify your criteria of research, if you don't want i can show you products based on your profile.",None,None
+            return "criteriaredefinition","Please respecify your criteria of research, if you don't want (say the same phrase) I can show you products based on your profile.",None,None
         else:
             products = getProductOpenSearch(question_dict,has_image,profile)
             text = generateTextFromProducts(products)
@@ -91,7 +91,7 @@ def generateInformationResponse(intend,previous_products,question_dict,has_image
         if len(question_dict)==0 and profile is None:
             return "criteriaredefinition","Please respecify your criteria of research or like some article, like the color, the brand, the material, the type of product, etc.",None,None
         elif len(question_dict)==0 and profile is not None:
-            return "criteriaredefinition","Please respecify your criteria of research, if you don't want (say the same phrase) i can show you products based on your profile.",None,None
+            return "criteriaredefinition","Please respecify your criteria of research, if you don't want (say the same phrase) I can show you products based on your profile.",None,None
         else:
             products = getProductOpenSearch(question_dict,has_image,profile)
             text = generateTextFromProducts(products)
@@ -113,7 +113,7 @@ def generateSupportResponse(intend,previous_products,question_dict,has_image,pro
         if len(question_dict)==0 and profile is None:
             return "criteriaredefinition","Please respecify your criteria of research, like the color, the brand, the material, the type of product, etc.",None,None
         elif len(question_dict)==0 and profile is not None:
-            return "criteriaredefinition","Please respecify your criteria of research, if you don't want i can show you products based on your profile.",None,None
+            return "criteriaredefinition","Please respecify your criteria of research, if you don't want (say the same phrase) I can show you products based on your profile.",None,None
         else:
             products = getProductOpenSearch(question_dict,has_image,profile)
             text = generateTextFromProducts(products)
