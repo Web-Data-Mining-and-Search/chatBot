@@ -73,9 +73,18 @@ def generateRetrievalResponse(intend,previous_products,question_dict,has_image,p
     elif "user_neutral" in intend:
         return "retrieval","Sorry, I wasn't prepared to answer those kind of question, can you rephrase it ?",None,previous_products
     elif intend=="user_request_get_products":
-        products = getProductOpenSearch(question_dict,has_image,profile)
-        text = generateTextFromProducts(products)
-        return "retrieval", text, recommandationsFromProducts(products),products
+        if len(question_dict)==0 and previous_products != None:
+            previous = getProductsfromPrevious(previous_products)
+            products_previous = getProductOpenSearch(previous,has_image,profile)
+            text = "Here some recommendations based on the previous products : "
+            return "retrieval", text, recommandationsFromProducts(products_previous),products_previous
+        elif len(question_dict)!=0:
+            products = getProductOpenSearch(question_dict,has_image,profile)
+            text = generateTextFromProducts(products)
+            return "retrieval", text, recommandationsFromProducts(products),products
+        else:
+            return "criteriaredefinition","Please respecify your criteria of research or like some items, like the color, the brand, the material, the type of product, etc.",None,None
+        
     elif "user_qa" in intend or "user_inform" in intend:
         return "information", informative.getInformativeText(previous_products,intend),None,previous_products
     else:
