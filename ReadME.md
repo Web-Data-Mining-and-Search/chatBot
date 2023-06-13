@@ -13,13 +13,17 @@ In the context of the Web data mining course, we had to implement a personal sho
 
 ## Description of our ChatBot
 ---
+### How to add the iFetch Extension to Chrome 
+To add the extension on Chrome you have to install:
+* [Install NPM ](https://docs.npmjs.com/cli/v6/commands/npm-install)
+
+In your terminal, open the folder iFetch-Chrome-Extension, and execute the command 'npm run build'. \
+After open your Chrome navigator and add the extension by selecting the foldel iFetch-Chrome-Extension/build. You have now our latest version of the chatbot
 
 ### How to run the code
 
 To run the code you will have to install the followings : 
 * [Install Python3](https://www.python.org/downloads/) (all the dependencies can be found in the file requirements.txt)
-
-* [Install Flask](https://flask.palletsprojects.com/en/2.1.x/installation/)
 
 * [Install PyTorch](https://pytorch.org/TensorRT/tutorials/installation.html)
 
