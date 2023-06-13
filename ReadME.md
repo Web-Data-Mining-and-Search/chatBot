@@ -18,7 +18,7 @@ To add the extension on Chrome you have to install:
 * [Install NPM ](https://docs.npmjs.com/cli/v6/commands/npm-install)
 
 In your terminal, open the folder iFetch-Chrome-Extension, and execute the command 'npm run build'. \
-After open your Chrome navigator and add the extension by selecting the foldel iFetch-Chrome-Extension/build. You have now our latest version of the chatbot
+After open your Chrome navigator and add the extension by selecting the folder iFetch-Chrome-Extension/build. You have now our latest version of the chatbot
 
 ### How to run the code
 
