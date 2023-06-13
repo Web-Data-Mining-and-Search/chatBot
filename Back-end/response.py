@@ -125,3 +125,15 @@ def generate_response(text, products):
         'system_action' : 'inform',
         }
 
+def getProductsfromPrevious(previous_products):
+    previous ={}
+    previous['category']= ''
+    previous['colour']=''
+    for key, values in previous_products[2].items():
+        if key == '_source':
+            for category, value in values.items():
+                if category=='product_family':
+                    previous['category']= previous['category']+value
+                elif category =='product_main_colour':
+                    previous['colour']= previous['colour']+ value
+    return previous
