@@ -34,7 +34,7 @@ client = OpenSearch(
 
 # make a request to the OpenSearch client
 
-def getProductOpenSearch(question_dict, has_image,profile=None):
+def getProductOpenSearch(question_dict, has_image,profile=None, ban_id = []):
     '''
     Returns a text response based on the given question dictionary and question image.
     
@@ -48,20 +48,18 @@ def getProductOpenSearch(question_dict, has_image,profile=None):
     @rtype: str
     '''
 
-    response = client.search(body = get_query(question_dict, has_image,profile),index = index_name)
+    response = client.search(body = get_query(question_dict, has_image,profile,ban_id),index = index_name)
+    
+
 
     return response['hits']['hits']
 
 
 def description_product(result):
     brand= result['_source']['product_brand']
-    category = result['_source']['product_category']
-    color = result['_source']['product_main_colour']
-    gender = result['_source']['product_gender']
+    short_description = result['_source']["product_short_description"]
+    return "This is a " + short_description + " from " + brand + "."
 
-    sentence = "This is a " + color.lower() +" " + category.lower()+ " for " + gender.lower() + " from the brand " +brand.lower()
-
-    return sentence
 
 
 # Add the recommendations to the response
@@ -76,13 +74,13 @@ def add_recommendations(result):
         'main_color' : result['_source']['product_main_colour'],
         'second_color' : result['_source']['product_second_color'],
         'material' : result['_source']['product_materials'],
-        # 'message' : description_product(result)
+        'message' : description_product(result)
     }
 
 # Generate the response
 
 def generateTextFromProducts(products):
-    return "I found {} products that match your request.".format(len(products))
+    return "Here is {} products that match your request.".format(len(products))
 
 
 def recommandationsFromProducts(results):
@@ -127,6 +125,7 @@ def generate_response(text, products):
 
 def getProductsfromPrevious(previous_products):
     previous ={}
+    ban_id = []
     previous['category']= ''
     previous['colour']=''
     for key, values in previous_products[2].items():
@@ -136,4 +135,7 @@ def getProductsfromPrevious(previous_products):
                     previous['category']= previous['category']+value
                 elif category =='product_main_colour':
                     previous['colour']= previous['colour']+ value
-    return previous
+    
+    for product in previous_products:
+        ban_id.append(product['_source']['product_id'])
+    return previous, ban_id
