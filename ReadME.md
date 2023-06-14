@@ -23,9 +23,17 @@ After open your Chrome navigator and add the extension by selecting the folder i
 ### How to run the code
 
 To run the code you will have to install the followings : 
-* [Install Python3](https://www.python.org/downloads/) (all the dependencies can be found in the file requirements.txt)
+* [Install Python3](https://www.python.org/downloads/) 
 
-* [Install PyTorch](https://pytorch.org/TensorRT/tutorials/installation.html)
+* [Install Pip](https://pip.pypa.io/en/stable/installation/)
+  
+You can then run the command 
+
+```bash
+pip install -r requirements.txt
+```
+
+Or install the libraries one by one listed in the requirements.txt file.
 
 Once those installations done, you will have to open a terminal and simply do the command python3 app.py once you are in the folder named Back-end
 
