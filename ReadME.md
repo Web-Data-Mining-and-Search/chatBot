@@ -26,6 +26,8 @@ To run the code you will have to install the followings :
 * [Install Python3](https://www.python.org/downloads/) 
 
 * [Install Pip](https://pip.pypa.io/en/stable/installation/)
+
+* [Install PyTorch](https://pytorch.org/TensorRT/tutorials/installation.html)
   
 You can then run the command 
 
